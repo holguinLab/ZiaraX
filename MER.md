@@ -7,7 +7,9 @@
 | Atributo        | Tipo de dato     | Descripción |
 |----------------|----------------|-------------|
 | `idUsuario`    | INT (PK, AI)    | Identificador único del usuario |
-| `nombre`       | VARCHAR(100)    | Nombre del usuario |
+| `nombre_completo`       | VARCHAR(254)    | Nombre Completo del usuario |
+| `telefono`       | VARCHAR(200)    | telefono del usuario |
+| `f_nacimiento`       | DATE()    | fecha nacimiento del usuario |
 | `correo`       | VARCHAR(100)    | Correo electrónico (único) |
 | `contraseña`   | VARCHAR(255)    | Contraseña encriptada |
 | `tipoUsuario`  | ENUM('Administrador', 'Barbero', 'Cliente') | Rol del usuario |
@@ -36,6 +38,9 @@
 | Atributo     | Tipo de dato  | Descripción |
 |-------------|--------------|-------------|
 | `idBarbero` | INT (PK, AI) | Identificador único del barbero |
+|  `especialidad`       | VARCHAR(254)    | especialidad del usuario |
+|  `horario_trabajo`       | VARCHAR(254)    | horario  del usuario |
+|   `Creador_admin`       | INT(FK)    | Relación con `Adminis(idAdmin)` |
 | `idUsuario` | INT (FK)     | Relación con `Usuarios(idUsuario)` |
 
 ✅ **Relación:**  

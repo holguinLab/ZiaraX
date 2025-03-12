@@ -62,27 +62,22 @@
             <div class="collapse navbar-collapse pt-0" id="navbarTogglerDemo01">
                 <ul class="navbar-nav ms-auto  mb-lg-0 gap-2 ">
                     <li class="nav-item">
-                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page"
-                            href="#">Login</a>
+                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page"
-                            href="#">Login</a>
+                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page"
-                            href="#">Login</a>
+                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page"
-                            href="#">Login</a>
+                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page"
-                            href="#">Login</a>
+                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'logout'%}">LOGOUT</a>
                     </li>
                 </ul>
-                
+
                 <ul class="navbar-nav ms-auto me-2 mb-lg-0 gap-2 ">
                     <li class="nav-item">
                         <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page"
@@ -129,7 +124,19 @@
         </div>
     </nav>
 
-
+    <!-- Mensajes -->
+    <div id="notificaciones">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags and message.tags != 'error' %}{{ message.tags }}{% else %}danger{% endif %} alert-dismissible fade show"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+    <!-- Fin Mensajes -->
 
 
     <!-- Main -->
@@ -137,19 +144,7 @@
     {%block main%}
     <main class="container flex-grow-1 d-flex">
 
-        <!-- Mensajes -->
-        <div id="notificaciones">
-            {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-{% if message.tags and message.tags != 'error' %}{{ message.tags }}{% else %}danger{% endif %} alert-dismissible fade show"
-                role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
-            {% endif %}
-        </div>
-        <!-- Fin Mensajes -->
+
 
     </main>
     {%endblock%}
