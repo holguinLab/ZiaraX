@@ -1,0 +1,72 @@
+{% extends 'panel/base_panel.html' %}
+{% load static %}
+{% block css %}
+{% endblock %}
+{% block titulo %}
+Iniciar Sesión
+{% endblock %}
+{% block h %}
+<style>
+</style>
+
+{% endblock %}
+
+{% block main %}
+<div class="container-fluid">
+    <div class="row min-vh-100 d-flex justify-content-center align-items-center">
+        <!-- Formulario -->
+        <div class="col-12 col-md-6 col-lg-5  d-flex justify-content-center">
+            <div class="card shadow-lg p-4 rounded-4" style="width: 90%; max-width: 400px;">
+                <h3 class="text-center mb-3">Login</h3>
+                <form class="needs-validation" method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="username" class="form-label">User</label>
+                        <div class="input-group">
+                            <span class="input-group-text">@</span>
+                            <input type="text" class="form-control" id="username" name="user" required 
+                                autocomplete="username">
+                            <div class="invalid-feedback">Ingrese un usuario válido.</div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" name="password" required 
+                                autocomplete="current-password">
+                            <div class="invalid-feedback">Ingresa tu contraseña.</div>
+                        </div>
+                    </div>
+                    <a href="#" class="d-block text-end mb-3">¿Olvidaste tu contraseña?</a>
+                    <button class="btn w-100" type="submit" style="background-color: #28CB8B; ">Login</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Imagen -->
+        <div class="col-12 col-md-6 col-lg-5 d-none d-md-block">
+            <div class="h-100 d-flex align-items-center">
+                <img src="{% static 'img/login3.svg' %}" class="img-fluid rounded-4 shadow-lg" 
+                    style="width: 100%; max-width: 90%; max-height: 80vh; object-fit: contain   ;" alt="Imagen descriptiva">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script para activar la validación de Bootstrap -->
+<script>
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+</script>
+{% endblock %}
