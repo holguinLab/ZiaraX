@@ -7,13 +7,14 @@ class Usuarios(models.Model):
     nombre_completo = models.CharField(max_length=254 ,null=True,blank=True)
     telefono = models.CharField(max_length=16 ,null=True,blank=True)
     f_nacimiento = models.DateField( null=True,blank=True)
-    foto = models.ImageField(upload_to="fotos/",blank=True,null=True)
+    foto = models.ImageField(upload_to="fotos/",blank=True,null=True,default='fotos/predeterminado.png')
     ROLES = (
         ("A","Admin"),
         ("B","Barbero"),
         ("C","Cliente"),
     )
     tipoUsuario = models.CharField(max_length=2,choices=ROLES,default='C')
+    token_recuperar_clave = models.CharField(max_length=6 , default='')
 
 
 class Administradores(models.Model):
