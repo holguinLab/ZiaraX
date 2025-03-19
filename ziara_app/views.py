@@ -160,7 +160,7 @@ def logout(request):
 
 def register(request):
     verificar = request.session.get('logueado',False)
-    if request == False :
+    if verificar == False :
         messages.warning(request,'Debes iniciar sesion primero')
         return redirect('login')
     else:
