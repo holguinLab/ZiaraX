@@ -1,1 +1,68 @@
-{%extends 'admin_base.html'%}
+{%extends 'admin/admin_base.html'%}
+{%load static%}
+{%block titulo%}Usuarios{%endblock%}
+{%block dataTables%}<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">{%endblock%}
+
+
+{%block main%}
+<div class="table-responsive  w-100 p-5">
+    <table id="miTabla" class="  pt-3 table  table-hover  w-100">
+        <thead >
+            <tr >
+                <th class="text-center">Nombre</th>
+                <th class="text-center" >Email</th>
+                <th class="text-center" >Telefono</th>
+                <th class="text-center" >Rol</th>
+                <th class="text-center" >Nick</th>
+                <th class="text-center" >Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for usuario in usuarios%}
+            <tr>
+                <td class="text-center">{{usuario.nombre_completo}}</td>
+                <td class="text-center">{{usuario.email}}</td>
+                <td class="text-center">{{usuario.telefono}}</td>
+                <td class="text-center">{{usuario.get_tipoUsuario_display}}</td>
+                <td class="text-center">{{usuario.username}}</td>
+                <td class="d-flex gap-2 justify-content-center align-items-center">
+                    <button class="btn btn-info btn-sm " >Editar</button>
+                    <button class="btn btn-warning btn-sm " >Eliminar</button>
+                </td>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+</div>
+{%endblock%}
+
+
+
+
+
+
+{%block configTables%}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#miTabla').DataTable({
+            paging: true, // Paginación
+            searching: true, // Búsqueda
+            ordering: true, // Ordenamiento
+            pageLength: 5, // Número de filas por página
+            language: {
+                search: "Buscar:", // Personaliza el texto de búsqueda
+                lengthMenu: "Mostrar _MENU_ registros",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                paginate: {
+                    first: "Primero",
+                    last: "Último",
+                    next: "Siguiente",
+                    previous: "Anterior"
+                }
+            }
+        });
+    });
+</script>
+{%endblock%}

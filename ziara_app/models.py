@@ -8,6 +8,7 @@ class Usuarios(models.Model):
     telefono = models.CharField(max_length=16 ,null=True,blank=True)
     f_nacimiento = models.DateField( null=True,blank=True)
     foto = models.ImageField(upload_to="fotos/",blank=True,null=True,default='fotos/predeterminado.png')
+    username = models.CharField(max_length=10 , blank=True, null=True,default='')
     ROLES = (
         ("A","Admin"),
         ("B","Barbero"),

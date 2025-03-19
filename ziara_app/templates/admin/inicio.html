@@ -1,0 +1,66 @@
+{%extends 'admin/admin_base.html'%}
+{%load static%}
+{%block titulo%}Inicio{%endblock%}
+{%block main%}
+<main class="container mt-4">
+    <div class="row">
+        <!-- Sección de estadísticas y saludo -->
+        <div class="col-md-6">
+            <div class="border d-flex flex-column  p-3">
+                <h2 id="greeting">Hola, JULIAN</h2>
+                <div class="d-flex gap-2 flex-wrap mt-3">
+                    <span class="badge bg-primary">Clientes registrados: 150</span>
+                    <span class="badge bg-success">Citas agendadas: 45</span>
+                    <span class="badge bg-warning">Ingresos del mes: $2,500</span>
+                    <span class="badge bg-danger">Top Servicio: Corte + Barba</span>
+                </div>
+            </div>
+
+            <!-- Últimas Acciones -->
+            <div class="card  shadow-sm mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Últimas Acciones</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li class="list-group-item">Juan Pérez agendó una cita</li>
+                        <li class="list-group-item">Se completó el servicio de Corte + Barba</li>
+                        <li class="list-group-item">María López canceló su cita</li>
+                        <li class="list-group-item">Carlos Gómez se registró en el sistema</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Empleados Activos</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>🔹 <strong>Pedro Ramírez</strong></span>
+                            <span class="badge bg-success">Disponible</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>🔹 <strong>Laura Gómez</strong></span>
+                            <span class="badge bg-danger">Ocupado</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>🔹 <strong>Carlos Méndez</strong></span>
+                            <span class="badge bg-warning">En Descanso</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>🔹 <strong>Ana Rodríguez</strong></span>
+                            <span class="badge bg-success">Disponible</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    
+    </div>
+</main>
+{%endblock%}

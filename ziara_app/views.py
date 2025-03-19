@@ -1,7 +1,9 @@
+# Importacion de librerias
 from django.shortcuts import render,redirect
 from django.contrib import messages 
 from .models import * # Importacion de todos los modelos en models.py
 from .utils import * # Importacion de la funcion de incriptacion y verificacion del archivo utils.py
+from django.db import IntegrityError
 
 # region PILLOW # ! Librerias Para usar PILLOW 🏙️ 
 from django.core.files.base import ContentFile
@@ -18,23 +20,10 @@ import re
 
 #region ENVIOCORREO 
 from django.core.mail import send_mail
-""" 
-    try:
-                    html_message = f'<strong>{q.nombre}</strong>, acabas de crear una cuenta como visitante en nuestra plataforma, sus datos son:<br><br>Nick: {q.nick}<br>Si quieres iniciar sesión, ve al siguiente link: <a href="http://127.0.0.1:8000/">Educalab Login</a>'
-
-                    send_mail(
-                        'Registro de Usuario en Educalab',
-                        "",
-                        'santiagoholguin150@gmail.com',
-                        [f'{q.correo}'],
-                        fail_silently=False, html_message = html_message
-                    )
-                    messages.success(request, "Correo enviado !!")
-                except Exception as error:
-                    messages.error(request, f"No se pudo enviar el correo: {error}")
-
-"""
 #endregion
+
+def index(request):
+    return render(request,'index.html')
 
 #region PROCESO DE IMAGENES
 def hacer_imagen_redonda(imagen, tamaño=(150, 150)):
@@ -63,15 +52,7 @@ def hacer_imagen_redonda(imagen, tamaño=(150, 150)):
     return ContentFile(buffer.getvalue())
 #endregion
 
-
-# Create your views here.
-def index(request):
-    verificar = request.session.get('logueado',False)
-    if verificar == False:
-        messages.warning(request,'ERROR : Debes Iniciar Sesion Primero ')
-        return redirect('login')
-    return render(request,'index.html')
-
+#region ADMIN PANEL
 def admin_panel(request):
     verificar = request.session.get('logueado',False)
     if verificar == False :
@@ -80,9 +61,34 @@ def admin_panel(request):
     elif not verificar['rol'] == 'A':
         messages.warning(request,'ERROR : NO TIENES LOS PERMISOS NECESARIOS 🚫 ')
         return redirect('index')
-    return render(request,'admin/admin_base.html')
+    return render(request,'admin/inicio.html')
 
 
+
+#region CRUD USUARIOS
+def listar_usuarios(request):
+    pass 
+
+def listar_usuarios(request):
+    verificar = request.session.get('logueado',False)
+    if not  verificar   :
+        messages.info(request,'Debes Iniciar Sesion Primero')
+        return redirect('index')
+    elif not verificar['rol'] == 'A':
+        messages.warning(request,'Permiso denegado')
+        return redirect('index')
+    else:
+        q = Usuarios.objects.all()
+        contexto = {
+            'usuarios' : q
+        }
+        return render(request,'admin/usuarios/listar_usuarios.html',contexto)
+
+
+
+
+
+#endregion
 
 #region PANEL DE SESION
 def login(request):
@@ -101,6 +107,7 @@ def login(request):
                     "id":consulta.id,
                     "email" :consulta.email,
                     "nombre" : consulta.nombre_completo,
+                    "username" : consulta.username,
                     "foto" : consulta.foto.url,
                     "rol" : consulta.tipoUsuario
                 }
@@ -146,7 +153,7 @@ def logout(request):
         try:
             del request.session['logueado']
             messages.success(request,'Se Cerro La Sesion Correctamente')
-            return redirect('login')
+            return redirect('index')
         except Exception as e:
             messages.info(request,f'Ocurrio Un Error Inesperado Intente Nuevamente Detalles: {e}')
         return redirect('index')
@@ -161,40 +168,56 @@ def register(request):
             foto = request.FILES.get('foto')
             password= request.POST.get('password')
             encriptada = hash_password(password)
-            
-            nuevo = Usuarios(
+            try:
+                q = Usuarios(
                 email = request.POST.get('email'),
                 password = encriptada,
-            )   
-            try:
-                nuevo.save()
+                nombre_completo = 'Explorador'
+                ) 
+                q.save()
+                messages.success(request,"Usuario Agregado Correctamente")
                 if foto:
                     foto_procesada = hacer_imagen_redonda(foto)
-                    nuevo.foto.save(f"perfil_{nuevo.email}.png", foto_procesada)
+                    q.foto.save(f"perfil_{q.email}.png", foto_procesada)
                 else:
                     # Si no subió foto, usar la predeterminada y hacerla redonda
                     default_path = os.path.join(settings.MEDIA_ROOT, 'fotos/predeterminado.png')
                     with open(default_path, 'rb') as default_image:
                         foto_procesada = hacer_imagen_redonda(default_image)
-                        nuevo.foto.save(f"perfil_{nuevo.email}.png", foto_procesada)  # Guarda la imagen
-                messages.success(request,"Usuario Agregado Correctamente")
-                
-                
-                html_message = f'<strong>{nuevo.nombre_completo}</strong>, acabas de crear una cuenta como visitante en nuestra plataforma, sus datos son:<br><br>Nick: {nuevo.tipoUsuario}<br>Si quieres iniciar sesión, ve al siguiente link: <a href="http://127.0.0.1:8000/">Ziara App</a>'
+                        q.foto.save(f"perfil_{q.email}.png", foto_procesada)  # Guarda la imagen
+                try:
+                    html_message = f'''
+                    <p>👋 Hola, <strong>Colega </strong> Listo para un nuevo estilo !</p>
 
-                send_mail(
-                    'Registro de Usuario en Educalab',
-                    "",
-                    'santiagoholguin150@gmail.com',
-                    [f'{nuevo.email}'],
-                    fail_silently=False, html_message = html_message
-                )
-                messages.success(request, "Correo enviado !!")
-                
+                    <p>Tu cuenta como <strong> {q.get_tipoUsuario_display()} </strong> ha sido creada exitosamente en nuestra plataforma. 🎉</p>
+
+                    <p>🔹 <strong>Correo electrónico:</strong> {q.email}</p>
+
+                    <p>Para acceder a tu cuenta, haz clic en el siguiente enlace:</p>
+
+                    <p>➡️ <a href="http://127.0.0.1:8000/" style="color: #007bff; text-decoration: none; font-weight: bold;">Iniciar sesión en Ziara App</a></p>
+
+                    <p>¡Bienvenido a Ziara! Estamos encantados de tenerte con nosotros. 💈✨</p>
+                    '''
+
+                    send_mail(
+                        'Registro de Usuario en Educalab',
+                        "",
+                        'santiagoholguin150@gmail.com',
+                        [f'{q.email}'],
+                        fail_silently=False, html_message = html_message
+                    )
+                    messages.success(request, "Correo enviado !!")
+                    return redirect('login')
+                except Exception as error :
+                    messages.error(request, f"No se pudo enviar el correo: {error}")
+                    return redirect('login')
+            except IntegrityError :
+                messages.error(request, 'ERROR : El correo ya esta en uso ')
                 return redirect('login')
-            except Exception as e :
-                messages.error(request, f'{e}')
-            return redirect('login')
+            except Exception as error :
+                    messages.error(request, f"ERROR: {error}")
+                    return redirect('login')
         else:
             consulta_roles = Usuarios.ROLES
             contexto = {
@@ -202,19 +225,12 @@ def register(request):
             }
             return render (request,'panel/base_panel.html',contexto)
 
-
-#'('email', 'password', 'nombre_completo', 'telefono', 'f_nacimiento', 'foto', 'tipoUsuario', )'
-#endregion
-
-
-
-#Region USUARIOS CRUD
-
-def listar_usuarios(request):
-    pass 
-
-
+# Recuperacion de clave por token 
 def recueperar_password(request):
+    verificar = request.session.get('logueado',False)
+    if verificar:
+        messages.error(request,'Permiso Denegado')
+        return redirect('index')
     if request.method == 'POST' :
         email = request.POST.get('email')
         try:
@@ -226,9 +242,28 @@ def recueperar_password(request):
         token = randint(10000,999999)
         q.token_recuperar_clave = token
         q.save()
-        
+        if q.username == '':
+            q.username = 'Invitado'
         try:
-            html_message = f'<strong>{q.nombre_completo}</strong>, acabas de crear una cuenta como visitante en nuestra plataforma, sus datos son:<br><br>Nick: {q.tipoUsuario}<br>Si quieres iniciar sesión, ve al siguiente link: <a href="http://127.0.0.1:8000/">Ziara App</a>'
+            html_message = f'''
+            <p><strong> {q.username} </strong>, hemos recibido una solicitud para restablecer tu contraseña.</p>
+
+            <p>Por favor, usa el siguiente token de seguridad para completar el proceso:</p>
+
+            <p><strong>TOKEN:</strong> {token}</p>
+
+            <p>Para continuar, haz clic en el siguiente enlace e ingresa el token:</p>
+
+            <p>
+                ➡️ <a href="http://127.0.0.1:8000/verificacion_token_recuperar_password/?email=True&correo={q.email}" 
+                style="color: #007bff; text-decoration: none; font-weight: bold;">
+                Recuperar contraseña en Ziara</a>
+            </p>
+
+            <p>Si no solicitaste este cambio, ignora este mensaje.</p>
+
+            <p>💈 <strong>El equipo de Ziara</strong></p>
+            '''
             send_mail(
                     'Registro de Usuario en Educalab',
                     "",
@@ -237,16 +272,48 @@ def recueperar_password(request):
                     fail_silently=False, html_message = html_message
                 )
             messages.success(request, "Correo enviado !!")
-            return redirect('recuperar_password')
+            return redirect('index')
         except Exception as e :
             messages.error(request, f'{e}')
             return redirect('recuperar_password')
     else:
         return render(request,'panel/recuperar_clave.html')
 
-
 def verificacion_token_recuperar_password(request):
+    verificar = request.session.get('logueado',False)
+    if verificar:
+        messages.error(request,'Permiso Denegado')
+        return redirect('index')
     if request.method == 'POST':
-        pass
+        token = request.POST.get('token')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+        try:
+            q = Usuarios.objects.get(email=email)
+            if q.token_recuperar_clave == token:
+                if password == password2:
+                    q.token_recuperar_clave = ''
+                    q.password = hash_password(password)
+                    q.save()
+                    messages.success(request, "Contraseña recuperada correctamente!")
+                    return redirect("login")
+                else:
+                    messages.warning(request,'Las contraseñas no conciden')
+            else:
+                    messages.warning(request,'No concide el token de seguridad')
+        except Usuarios.DoesNotExist:
+                messages.warning(request,'No hay Cuentas Asociadas')
+        except Exception as e:
+            messages.warning(request,'No hay Cuentas Asociadas')
+        return redirect('verificacion_token_recuperar_password')
     else:
-        return render(request,'panel/verificacion_token_recuperar_password.html')
+        correo = request.GET.get('correo')
+        contexto ={
+            'correo' :correo
+        }
+        return render(request,'panel/verificacion_token_recuperar_password.html',contexto)
+
+#'('email', 'password', 'nombre_completo', 'telefono', 'f_nacimiento', 'foto', 'tipoUsuario', )'
+#endregion
+

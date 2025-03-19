@@ -62,59 +62,86 @@
             <div class="collapse navbar-collapse pt-0" id="navbarTogglerDemo01">
                 <ul class="navbar-nav ms-auto  mb-lg-0 gap-2 ">
                     <li class="nav-item">
-                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">Login</a>
+                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">En proceso</a>
                     </li>
                     <li class="nav-item">
-                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">Login</a>
+                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">En proceso</a>
                     </li>
                     <li class="nav-item">
-                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">Login</a>
+                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">En proceso</a>
                     </li>
                     <li class="nav-item">
-                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'logout'%}">LOGOUT</a>
+                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">En proceso</a>
                     </li>
                 </ul>
 
                 <ul class="navbar-nav ms-auto me-2 mb-lg-0 gap-2 ">
+                    
                     <li class="nav-item">
+                        {%if not request.session.logueado %}
                         <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page"
                             href="{% url 'login' %}">Login</a>
+                        {%endif%}
                     </li>
                     <!-- Dropdown de registro -->
                     <li class="nav-item dropdown">
-                        <div class="d-flex">
-                            <button type="button" class="btn text-light btn-outline dropdown-toggle"
-                                style="background-color: #237D31;" data-bs-toggle="dropdown" aria-expanded="false"
-                                data-bs-auto-close="outside">
-                                Sign Up
-                            </button>
-                            <form enctype="multipart/form-data" class="dropdown-menu dropdown-menu-end p-4 row"
-                                action="" method="post" style="min-width: 300px;">
-                                {% csrf_token %}
-                                <label for="usuario" class="form-label">Usuario</label>
-                                <div class="input-group mb-3 col-12">
-                                    <span class="input-group-text" id="inputGroupPrepend">@</span>
-                                    <input type="text" name="usuario" class="form-control" id="usuario"
-                                        placeholder="Joe Doe" required>
-                                </div>
-                                <div class="mb-3 col-12">
-                                    <label for="password" class="form-label">Contraseña</label>
-                                    <input type="password" name="password2" class="form-control" id="password2"
-                                        placeholder="************" required>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="form-check text-primary">
-                                        <input type="checkbox" class="form-check-input" id="dropdownCheck2">
-                                        <label class="form-check-label" for="dropdownCheck2">
-                                            Recordarme
-                                        </label>
+                        {%if not request.session.logueado %}
+                            <div class="d-flex">
+                                <button type="button" class="btn text-light btn-outline dropdown-toggle"
+                                    style="background-color: #237D31;" data-bs-toggle="dropdown" aria-expanded="false"
+                                    data-bs-auto-close="outside">
+                                    Sign Up
+                                </button>
+                                <form enctype="multipart/form-data" class="dropdown-menu dropdown-menu-end p-4 row"
+                                    action="" method="post" style="min-width: 300px;">
+                                    {% csrf_token %}
+                                    <label for="usuario" class="form-label">Usuario</label>
+                                    <div class="input-group mb-3 col-12">
+                                        <span class="input-group-text" id="inputGroupPrepend">@</span>
+                                        <input type="text" name="usuario" class="form-control" id="usuario"
+                                            placeholder="Joe Doe" required>
                                     </div>
-                                </div>
-                                <button type="submit" class="btn  btn-outline-success w-100">Sign Up</button>
-                            </form>
+                                    <div class="mb-3 col-12">
+                                        <label for="password" class="form-label">Contraseña</label>
+                                        <input type="password" name="password2" class="form-control" id="password2"
+                                            placeholder="************" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check text-primary">
+                                            <input type="checkbox" class="form-check-input" id="dropdownCheck2">
+                                            <label class="form-check-label" for="dropdownCheck2">
+                                                Recordarme
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn  btn-outline-success w-100">Sign Up</button>
+                                </form>
+                        {%elif not request.session.logueado.rol == 'A' %}
+                            <div class="dropdown">
+                                <a class="navbar-brand" href="">
+                                    <img src="{{request.session.logueado.foto}}" alt="Foto de Perfil" width="40" height="40" class="d-inline-block rounded-circle">
+                                </a>
+                                <button class="btn btn-success dropdown-toggle" type="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    {%if request.session.logueado.username == '' or request.session.logueado.username == None %}
+                                        @Perfil
+                                    {%else%}
+                                        @{{request.session.logueado.username}}
+                                    {%endif%}
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#">Editar Perfil</a></li>
+                                    <li><a class="dropdown-item" href="#">Configuración</a></li>
+                                    <li><a class="dropdown-item" href="#">Cambiar Contraseña</a></li>
+                                    <li><a class="dropdown-item" href="#">Mis Citas</a></li>  <!-- Si aplicas esto en Ziara -->
+                                    <li><a class="dropdown-item" href="#">Historial de Pagos</a></li> 
+                                    <hr>
+                                    <li><a class="dropdown-item text-danger" href="{%url 'logout'%}">Cerrar Sesión</a></li>
+                                </ul>
+                            </div>
+                        {%else%}
+                            <a href="{%url 'admin_panel'%}" class="btn btn-success">Ziara Admin </a>
+                        {%endif%}
                         </div>
                     </li>
                 </ul>

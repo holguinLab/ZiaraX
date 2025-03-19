@@ -4,5 +4,5 @@ from . models import *
 
 @admin.register(Usuarios)
 class adminUsuarios(admin.ModelAdmin):
-    list_display=['id','email','password','nombre_completo','tipoUsuario','foto']
-    list_editable=['email','password','password','nombre_completo','tipoUsuario','foto']
+    list_display=['id','email','password','nombre_completo','tipoUsuario','foto','token_recuperar_clave','username']
+    list_editable=['email','password','password','nombre_completo','tipoUsuario','foto','username']
