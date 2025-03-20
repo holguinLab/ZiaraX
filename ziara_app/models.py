@@ -24,7 +24,7 @@ class Administradores(models.Model):
 class Barberos(models.Model):
     usuario_barbero = models.ForeignKey('Usuarios',on_delete=models.CASCADE,related_name="barberos") 
     admin_creador = models.ForeignKey('Usuarios',on_delete=models.SET_NULL,null=True,related_name="barberos_creados") #Django podría lanzar advertencias si tienes múltiples ForeignKeys apuntando a Usuarios. related name ayuda para eso
-    horario_trabajo = models.TextField(null=False,blank=False)
+    horario_trabajo = models.TextField(null=True,blank=True)
     especialidad = models.CharField(max_length=200,null=True,blank=True)
 
 class Clientes(models.Model):

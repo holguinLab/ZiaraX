@@ -86,26 +86,40 @@
                     <!-- Dropdown de registro -->
                     <li class="nav-item dropdown">
                         {%if not request.session.logueado %}
-                            <div class="d-flex">
+                        <div class="d-flex">
+                            {%if not request.session.logueado %}
                                 <button type="button" class="btn text-light btn-outline dropdown-toggle"
                                     style="background-color: #237D31;" data-bs-toggle="dropdown" aria-expanded="false"
                                     data-bs-auto-close="outside">
                                     Sign Up
                                 </button>
-                                <form enctype="multipart/form-data" class="dropdown-menu dropdown-menu-end p-4 row"
-                                    action="" method="post" style="min-width: 300px;">
-                                    {% csrf_token %}
-                                    <label for="usuario" class="form-label">Usuario</label>
+                                <form method="post" action="{%url 'register'%}" enctype="multipart/form-data"
+                                    class="dropdown-menu dropdown-menu-end p-4 row" style="min-width: 300px;">
+                                    {%csrf_token%}
+                                    <label for="email" class="form-label">Email</label>
                                     <div class="input-group mb-3 col-12">
-                                        <span class="input-group-text" id="inputGroupPrepend">@</span>
-                                        <input type="text" name="usuario" class="form-control" id="usuario"
-                                            placeholder="Joe Doe" required>
+                                        <input type="text" name="email" class="form-control" id="email"
+                                            placeholder="JoeDoe@ejemplo.com" required>
                                     </div>
                                     <div class="mb-3 col-12">
-                                        <label for="password" class="form-label">Contraseña</label>
-                                        <input type="password" name="password2" class="form-control" id="password2"
+                                        <label for="password" class="form-label">Password</label>
+                                        <input type="password" name="password" class="form-control" id="password"
                                             placeholder="************" required>
                                     </div>
+
+                                    {%if request.session.logueado%}
+                                    <div class="col-md-12">
+                                        <label class="form-label" for="foto">Cargar Foto</label>
+                                        <input type="file" class="form-control" name="foto" id="foto">
+                                    </div>
+                                    {%endif%}
+
+                                    {%if request.session.logueado%}
+                                    <div class="col-md-12">
+                                        <input type="text" class="form-control" name="rol" id="rol">
+                                    </div>
+                                    {%endif%}
+
                                     <div class="mb-3">
                                         <div class="form-check text-primary">
                                             <input type="checkbox" class="form-check-input" id="dropdownCheck2">
@@ -114,8 +128,10 @@
                                             </label>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn  btn-outline-success w-100">Sign Up</button>
+                                    <button type="submit" class="btn btn-outline-success   w-100 ">Sign Up</button>
                                 </form>
+                            {%endif%}
+                        </div>
                         {%elif not request.session.logueado.rol == 'A' %}
                             <div class="dropdown">
                                 <a class="navbar-brand" href="">

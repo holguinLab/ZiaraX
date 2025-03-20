@@ -63,11 +63,96 @@ def admin_panel(request):
         return redirect('index')
     return render(request,'admin/inicio.html')
 
-
-
 #region CRUD USUARIOS
-def listar_usuarios(request):
-    pass 
+def listar_barberos(request):
+    verificar = request.session.get('logueado',False)
+    if not verificar:
+        messages.info(request,'Debes Iniciar Sesion Primero')
+        return redirect('index')   
+    elif not verificar['rol'] == 'A':
+        messages.warning(request,'Permiso denegado')
+        return redirect('index')
+    else:
+        q = Barberos.objects.all()
+        roles = Usuarios.ROLES
+        contexto = {
+            'barberos' : q,
+            'roles' : roles
+        }
+        return render (request,'admin/barberos/listar_barberos.html',contexto)
+
+
+def añadir_barberos(request):
+    verificar =request.session.get('logueado',False)
+    if not verificar :
+        messages.info(request,'Debes Iniciar Sesion Primero')
+        return redirect('index') 
+    elif not verificar['rol'] == 'A':
+        messages.warning(request,'Permiso denegado')
+        return redirect('index')
+    else:
+        if request.method == 'POST':
+            foto = request.FILES.get('foto')
+            rol = request.POST.get('rol')
+            password= request.POST.get('password')
+            encriptada = hash_password(password)
+            try:
+                q = Usuarios(
+                email = request.POST.get('email'),
+                password = encriptada,
+                nombre_completo = 'Explorador'
+                )
+                q.save()
+                messages.success(request,"Usuario Agregado Correctamente")
+                if foto:
+                    foto_procesada = hacer_imagen_redonda(foto)
+                    q.foto.save(f"perfil_{q.email}.png", foto_procesada)
+                else:
+                    # Si no subió foto, usar la predeterminada y hacerla redonda
+                    default_path = os.path.join(settings.MEDIA_ROOT, 'fotos/predeterminado.png')
+                    with open(default_path, 'rb') as default_image:
+                        foto_procesada = hacer_imagen_redonda(default_image)
+                        q.foto.save(f"perfil_{q.email}.png", foto_procesada)  # Guarda la imagen
+                if rol == 'B' :
+                    new_barber = Barberos(
+                        usuario_barbero = q
+                    )
+                    new_barber.save()
+                try:
+                    html_message = f'''
+                    <p>👋 Hola, <strong>Colega </strong> Listo para un nuevo estilo !</p>
+
+                    <p>Tu cuenta como <strong> {q.get_tipoUsuario_display()} </strong> ha sido creada exitosamente en nuestra plataforma. 🎉</p>
+
+                    <p>🔹 <strong>Correo electrónico:</strong> {q.email}</p>
+
+                    <p>Para acceder a tu cuenta, haz clic en el siguiente enlace:</p>
+
+                    <p>➡️ <a href="http://127.0.0.1:8000/" style="color: #007bff; text-decoration: none; font-weight: bold;">Iniciar sesión en Ziara App</a></p>
+
+                    <p>¡Bienvenido a Ziara! Estamos encantados de tenerte con nosotros. 💈✨</p>
+                    '''
+
+                    send_mail(
+                        'Registro de Usuario en Educalab',
+                        "",
+                        'santiagoholguin150@gmail.com',
+                        [f'{q.email}'],
+                        fail_silently=False, html_message = html_message
+                    )
+                    messages.success(request, "Correo enviado !!")
+                    return redirect('login')
+                except Exception as error :
+                    messages.error(request, f"No se pudo enviar el correo: {error}")
+                    return redirect('login')
+            except IntegrityError :
+                messages.error(request, 'ERROR : El correo ya esta en uso ')
+                return redirect('login')
+            except Exception as error :
+                    messages.error(request, f"ERROR: {error}")
+                    return redirect('login')
+        else:
+            return render(request,'admin/barberos/listar_barberos.html')
 
 def listar_usuarios(request):
     verificar = request.session.get('logueado',False)
@@ -83,9 +168,6 @@ def listar_usuarios(request):
             'usuarios' : q
         }
         return render(request,'admin/usuarios/listar_usuarios.html',contexto)
-
-
-
 
 
 #endregion
@@ -159,71 +241,72 @@ def logout(request):
         return redirect('index')
 
 def register(request):
-    verificar = request.session.get('logueado',False)
-    if verificar == False :
-        messages.warning(request,'Debes iniciar sesion primero')
-        return redirect('login')
-    else:
-        if request.method == 'POST' :
-            foto = request.FILES.get('foto')
-            password= request.POST.get('password')
-            encriptada = hash_password(password)
+    if request.method == 'POST' :
+        foto = request.FILES.get('foto')
+        rol = request.POST.get('rol')
+        password= request.POST.get('password')
+        encriptada = hash_password(password)
+        try:
+            q = Usuarios(
+            email = request.POST.get('email'),
+            password = encriptada,
+            nombre_completo = 'Explorador'
+            ) 
+            q.save()
+            messages.success(request,"Usuario Agregado Correctamente")
+            if foto:
+                foto_procesada = hacer_imagen_redonda(foto)
+                q.foto.save(f"perfil_{q.email}.png", foto_procesada)
+            else:
+                # Si no subió foto, usar la predeterminada y hacerla redonda
+                default_path = os.path.join(settings.MEDIA_ROOT, 'fotos/predeterminado.png')
+                with open(default_path, 'rb') as default_image:
+                    foto_procesada = hacer_imagen_redonda(default_image)
+                    q.foto.save(f"perfil_{q.email}.png", foto_procesada)  # Guarda la imagen
+            if rol == 'B' :
+                new_barber = Barberos(
+                    usuario_barbero = q
+                )
+                new_barber.save()
             try:
-                q = Usuarios(
-                email = request.POST.get('email'),
-                password = encriptada,
-                nombre_completo = 'Explorador'
-                ) 
-                q.save()
-                messages.success(request,"Usuario Agregado Correctamente")
-                if foto:
-                    foto_procesada = hacer_imagen_redonda(foto)
-                    q.foto.save(f"perfil_{q.email}.png", foto_procesada)
-                else:
-                    # Si no subió foto, usar la predeterminada y hacerla redonda
-                    default_path = os.path.join(settings.MEDIA_ROOT, 'fotos/predeterminado.png')
-                    with open(default_path, 'rb') as default_image:
-                        foto_procesada = hacer_imagen_redonda(default_image)
-                        q.foto.save(f"perfil_{q.email}.png", foto_procesada)  # Guarda la imagen
-                try:
-                    html_message = f'''
-                    <p>👋 Hola, <strong>Colega </strong> Listo para un nuevo estilo !</p>
+                html_message = f'''
+                <p>👋 Hola, <strong>Colega </strong> Listo para un nuevo estilo !</p>
 
-                    <p>Tu cuenta como <strong> {q.get_tipoUsuario_display()} </strong> ha sido creada exitosamente en nuestra plataforma. 🎉</p>
+                <p>Tu cuenta como <strong> {q.get_tipoUsuario_display()} </strong> ha sido creada exitosamente en nuestra plataforma. 🎉</p>
 
-                    <p>🔹 <strong>Correo electrónico:</strong> {q.email}</p>
+                <p>🔹 <strong>Correo electrónico:</strong> {q.email}</p>
 
-                    <p>Para acceder a tu cuenta, haz clic en el siguiente enlace:</p>
+                <p>Para acceder a tu cuenta, haz clic en el siguiente enlace:</p>
 
-                    <p>➡️ <a href="http://127.0.0.1:8000/" style="color: #007bff; text-decoration: none; font-weight: bold;">Iniciar sesión en Ziara App</a></p>
+                <p>➡️ <a href="http://127.0.0.1:8000/" style="color: #007bff; text-decoration: none; font-weight: bold;">Iniciar sesión en Ziara App</a></p>
 
-                    <p>¡Bienvenido a Ziara! Estamos encantados de tenerte con nosotros. 💈✨</p>
-                    '''
+                <p>¡Bienvenido a Ziara! Estamos encantados de tenerte con nosotros. 💈✨</p>
+                '''
 
-                    send_mail(
-                        'Registro de Usuario en Educalab',
-                        "",
-                        'santiagoholguin150@gmail.com',
-                        [f'{q.email}'],
-                        fail_silently=False, html_message = html_message
-                    )
-                    messages.success(request, "Correo enviado !!")
-                    return redirect('login')
-                except Exception as error :
-                    messages.error(request, f"No se pudo enviar el correo: {error}")
-                    return redirect('login')
-            except IntegrityError :
-                messages.error(request, 'ERROR : El correo ya esta en uso ')
+                send_mail(
+                    'Registro de Usuario en Educalab',
+                    "",
+                    'santiagoholguin150@gmail.com',
+                    [f'{q.email}'],
+                    fail_silently=False, html_message = html_message
+                )
+                messages.success(request, "Correo enviado !!")
                 return redirect('login')
             except Exception as error :
-                    messages.error(request, f"ERROR: {error}")
-                    return redirect('login')
-        else:
-            consulta_roles = Usuarios.ROLES
-            contexto = {
-                'roles' : consulta_roles
-            }
-            return render (request,'panel/base_panel.html',contexto)
+                messages.error(request, f"No se pudo enviar el correo: {error}")
+                return redirect('login')
+        except IntegrityError :
+            messages.error(request, 'ERROR : El correo ya esta en uso ')
+            return redirect('login')
+        except Exception as error :
+                messages.error(request, f"ERROR: {error}")
+                return redirect('login')
+    else:
+        consulta_roles = Usuarios.ROLES
+        contexto = {
+            'roles' : consulta_roles
+        }
+        return render (request,'index.html',contexto)
 
 # Recuperacion de clave por token 
 def recueperar_password(request):

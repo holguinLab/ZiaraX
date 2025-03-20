@@ -8,10 +8,17 @@ urlpatterns=[
     path('login',login,name='login'),
     path('register/',register,name='register'),
     
-    # PANEL ADMIN 
+    #  #-----> CRUD   PANEL ADMIN    <------- 
     path('admin_panel/',admin_panel,name='admin_panel'),
-    #-----> CRUD : USUARIOS <------- 
+    
+    # USUARIOS 
     path('listar_usuarios/',listar_usuarios,name='listar_usuarios'),
+    
+    # BARBEROS 
+    path('listar_barberos/',listar_barberos,name='listar_barberos'),
+
+    
+    
     
     # PANEL DE USUARIO
     path('logout/',logout,name='logout'),

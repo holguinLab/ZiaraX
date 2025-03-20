@@ -72,7 +72,6 @@
                                     {%csrf_token%}
                                     <label for="email" class="form-label">Email</label>
                                     <div class="input-group mb-3 col-12">
-                                        <span class="input-group-text" id="inputGroupPrepend">@</span>
                                         <input type="text" name="email" class="form-control" id="email"
                                             placeholder="JoeDoe@ejemplo.com" required>
                                     </div>
@@ -86,6 +85,12 @@
                                     <div class="col-md-12">
                                         <label class="form-label" for="foto">Cargar Foto</label>
                                         <input type="file" class="form-control" name="foto" id="foto">
+                                    </div>
+                                    {%endif%}
+
+                                    {%if request.session.logueado%}
+                                    <div class="col-md-12">
+                                        <input type="text" class="form-control" name="rol" id="rol">
                                     </div>
                                     {%endif%}
 
