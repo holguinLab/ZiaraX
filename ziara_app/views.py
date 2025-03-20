@@ -22,6 +22,7 @@ import re
 from django.core.mail import send_mail
 #endregion
 
+# Esta funcion solo muestra el index.html cuando se llama 
 def index(request):
     return render(request,'index.html')
 
@@ -63,97 +64,7 @@ def admin_panel(request):
         return redirect('index')
     return render(request,'admin/inicio.html')
 
-#region CRUD USUARIOS
-def listar_barberos(request):
-    verificar = request.session.get('logueado',False)
-    if not verificar:
-        messages.info(request,'Debes Iniciar Sesion Primero')
-        return redirect('index')   
-    elif not verificar['rol'] == 'A':
-        messages.warning(request,'Permiso denegado')
-        return redirect('index')
-    else:
-        q = Barberos.objects.all()
-        roles = Usuarios.ROLES
-        contexto = {
-            'barberos' : q,
-            'roles' : roles
-        }
-        return render (request,'admin/barberos/listar_barberos.html',contexto)
-
-
-def añadir_barberos(request):
-    verificar =request.session.get('logueado',False)
-    if not verificar :
-        messages.info(request,'Debes Iniciar Sesion Primero')
-        return redirect('index') 
-    elif not verificar['rol'] == 'A':
-        messages.warning(request,'Permiso denegado')
-        return redirect('index')
-    else:
-        if request.method == 'POST':
-            foto = request.FILES.get('foto')
-            rol = request.POST.get('rol')
-            password= request.POST.get('password')
-            encriptada = hash_password(password)
-            try:
-                q = Usuarios(
-                email = request.POST.get('email'),
-                password = encriptada,
-                nombre_completo = 'Explorador'
-                )
-                q.save()
-                messages.success(request,"Usuario Agregado Correctamente")
-                if foto:
-                    foto_procesada = hacer_imagen_redonda(foto)
-                    q.foto.save(f"perfil_{q.email}.png", foto_procesada)
-                else:
-                    # Si no subió foto, usar la predeterminada y hacerla redonda
-                    default_path = os.path.join(settings.MEDIA_ROOT, 'fotos/predeterminado.png')
-                    with open(default_path, 'rb') as default_image:
-                        foto_procesada = hacer_imagen_redonda(default_image)
-                        q.foto.save(f"perfil_{q.email}.png", foto_procesada)  # Guarda la imagen
-                if rol == 'B' :
-                    new_barber = Barberos(
-                        usuario_barbero = q
-                    )
-                    new_barber.save()
-                try:
-                    html_message = f'''
-                    <p>👋 Hola, <strong>Colega </strong> Listo para un nuevo estilo !</p>
-
-                    <p>Tu cuenta como <strong> {q.get_tipoUsuario_display()} </strong> ha sido creada exitosamente en nuestra plataforma. 🎉</p>
-
-                    <p>🔹 <strong>Correo electrónico:</strong> {q.email}</p>
-
-                    <p>Para acceder a tu cuenta, haz clic en el siguiente enlace:</p>
-
-                    <p>➡️ <a href="http://127.0.0.1:8000/" style="color: #007bff; text-decoration: none; font-weight: bold;">Iniciar sesión en Ziara App</a></p>
-
-                    <p>¡Bienvenido a Ziara! Estamos encantados de tenerte con nosotros. 💈✨</p>
-                    '''
-
-                    send_mail(
-                        'Registro de Usuario en Educalab',
-                        "",
-                        'santiagoholguin150@gmail.com',
-                        [f'{q.email}'],
-                        fail_silently=False, html_message = html_message
-                    )
-                    messages.success(request, "Correo enviado !!")
-                    return redirect('login')
-                except Exception as error :
-                    messages.error(request, f"No se pudo enviar el correo: {error}")
-                    return redirect('login')
-            except IntegrityError :
-                messages.error(request, 'ERROR : El correo ya esta en uso ')
-                return redirect('login')
-            except Exception as error :
-                    messages.error(request, f"ERROR: {error}")
-                    return redirect('login')
-        else:
-            return render(request,'admin/barberos/listar_barberos.html')
-
+#USUARIOS
 def listar_usuarios(request):
     verificar = request.session.get('logueado',False)
     if not  verificar   :
@@ -164,11 +75,12 @@ def listar_usuarios(request):
         return redirect('index')
     else:
         q = Usuarios.objects.all()
+        ROLES = Usuarios.ROLES
         contexto = {
-            'usuarios' : q
+            'usuarios' : q,
+            'roles' :ROLES
         }
         return render(request,'admin/usuarios/listar_usuarios.html',contexto)
-
 
 #endregion
 
@@ -195,8 +107,10 @@ def login(request):
                 }
                 verificar = request.session.get('logueado',False)
                 nombre = verificar['nombre']
+                # Si el nombre esta vacio se asigna explorador para que en el envio del correo no quede vacio ni en las tablas
                 if nombre  == None :
                     nombre = 'Explorador'
+                # segun el rol que inicia sesion se muestra un mensaje si es admin , se redirecciona al panel del administrador
                 if verificar['rol'] == 'A':
                     messages.success(request,f'Inicio de Sesion Exitoso , Hola de nuevo  Admin / {nombre}')
                     return redirect('admin_panel')
@@ -209,17 +123,21 @@ def login(request):
             #Si la contraseña no concide con el hash guardado
             else:
                 messages.error(request,'No existe el usuario')
+        #Si el usuario no existe en la base de datos
         except Usuarios.DoesNotExist :
             messages.error(request,'ERROR : No se encontraron cuentas asociadas')
             request.session['logueado'] = None
+        # si el usuario no existe en la base de datos 
         except NameError :
             messages.error(request,'ERROR : No se encontraron cuentas asociadas')
             request.session['logueado'] = None
+        # Errores internos
         except Exception as e :
             messages.error(request,f'ERROR :{e}')
             request.session['logueado'] = None
         return redirect('login')
     else:
+        # si el usuario ya incio sesion , no podra devolverse a esta vista , debera cerrar sesion 
         verificar = request.session.get('logueado',False)
         if verificar:
             messages.error(request ,'Ya Iniciaste Sesion ')
@@ -227,33 +145,50 @@ def login(request):
         return render(request,'panel/login.html')
 
 def logout(request):
+    #si no esta logueado mostrar error y redirecciona al login
     verificar = request.session.get('logueado',False)
     if verificar == False :
         messages.warning(request,'ERROR : Lo Siento Debes Iniciar Sesion Primero')
         return redirect('login')
+    #si ya inicio sesion podra destuir la sesion 
     else:
         try:
             del request.session['logueado']
             messages.success(request,'Se Cerro La Sesion Correctamente')
             return redirect('index')
+        # mas que todo este error es por si falla la conexion 
         except Exception as e:
             messages.info(request,f'Ocurrio Un Error Inesperado Intente Nuevamente Detalles: {e}')
         return redirect('index')
 
 def register(request):
+    # solo el admin puede crear cuentas de admin y de barbero desde el panel de administrador siendo asi , usamos esta misma vista para procesar tanto los registros de los usuarios como los registros de los barberos y los admistradotrs y clientes , evitando usar muchas funciones de registro tambien evitamos crear formularios ya que el formulario de registro casi siempre es un dropdown que solo admite , correo y password si se va registrar desde la vista de login o index ( sin tener una sesion si ya tiene una sesion no podra ir al login ) , si es desde el panel del admin las opciones cambian y ya puede el admin registrar barberos y admin por medio de un campo que le aparece de ROL 
+    """ 
+    Función para registrar nuevos usuarios (Clientes, Barberos y Administradores).
+    
+    - Clientes solo pueden registrarse desde el login/index.
+    - Solo los administradores pueden crear cuentas de Barberos y Administradores.
+    - Se evita el uso de múltiples vistas y formularios innecesarios.
+    """
+    
     if request.method == 'POST' :
-        foto = request.FILES.get('foto')
-        rol = request.POST.get('rol')
-        password= request.POST.get('password')
-        encriptada = hash_password(password)
+        foto = request.FILES.get('foto') # Estas opcion esta oculta en el html para todos los roles  pero la pongo para que se pueda procesar la foto decir si es se sube o no 
+        rol = request.POST.get('rol') # lo mismo pasa con el rol pero esta opcion si la muestro en el Panel del adminstrador , ya que solo el admin puede crear cuentas con rol  Admin y Barbero (Cuentas con rol Cliente no puede creear)
+        password= request.POST.get('password') # Se optiene el password del html
+        encriptada = hash_password(password) # se encripta la password del html 
+        
+        # Try para procesar el guardado de usuario en la BD
         try:
+            # Se asigna la variable que guardara el usuario 
             q = Usuarios(
-            email = request.POST.get('email'),
+            email = request.POST.get('email'), # se obtine el email del formulario (en este caso esta funcion esta para funcionar atravves de una url asiganada en un action de un html)
             password = encriptada,
-            nombre_completo = 'Explorador'
+            nombre_completo = 'Explorador',
+            tipoUsuario = rol
             ) 
-            q.save()
-            messages.success(request,"Usuario Agregado Correctamente")
+            q.save() # se guara el usuario que esta en la variable q en la BD si todo esta bien 
+            
+            # SI se sube foto se procesa y se vuelve redonda y si no se sube predeterminada
             if foto:
                 foto_procesada = hacer_imagen_redonda(foto)
                 q.foto.save(f"perfil_{q.email}.png", foto_procesada)
@@ -263,11 +198,30 @@ def register(request):
                 with open(default_path, 'rb') as default_image:
                     foto_procesada = hacer_imagen_redonda(default_image)
                     q.foto.save(f"perfil_{q.email}.png", foto_procesada)  # Guarda la imagen
+
+
+            # Si se registra como barbero hacer la conexion con la clase Barberos con la instancia del usuario q
             if rol == 'B' :
+                # se asigna la variable para guarar el barbero con la instancia del usuario que se acaba de crear si el rol es barbero 
                 new_barber = Barberos(
                     usuario_barbero = q
                 )
+                messages.success(request,"Barbero Agregado Correctamente")
                 new_barber.save()
+            # Si se registra como administrador hacer la conexion a la clase Adminustrador con la instancia del usuario q que se acabo de creear
+            elif rol == 'A':
+                # se asigna la variable para guarar el admin con la instancia del usuario que se acaba de crear si el rol es admin 
+                new_admin = Administradores(
+                    usuario_admin = q
+                )
+                messages.success(request,"Administrador Agregado Correctamente")
+                new_admin.save()
+            # Si no es por que el rol es cliente 
+            else:
+                messages.success(request,"Su cuenta ha sido registrada con exito")
+            
+            
+            # Envio de correo si el correo es gmail , si no es gmail o el correo no existe , de igual forma se crea el usuario
             try:
                 html_message = f'''
                 <p>👋 Hola, <strong>Colega </strong> Listo para un nuevo estilo !</p>
@@ -290,23 +244,39 @@ def register(request):
                     [f'{q.email}'],
                     fail_silently=False, html_message = html_message
                 )
-                messages.success(request, "Correo enviado !!")
-                return redirect('login')
+                
+                # Condicionales para cada rol evitar mensajes incoherentes o inapropiados o redirecciones no debibas 
+                if rol == 'B'  or rol == 'A':
+                    messages.success(request, "Correo enviado !!")
+                    return redirect('listar_usuarios')
+                else:
+                    messages.success(request, "Correo enviado !!")
+                    return redirect('login')
             except Exception as error :
-                messages.error(request, f"No se pudo enviar el correo: {error}")
-                return redirect('login')
+                if rol == 'B'  or rol == 'A':
+                    messages.error(request, f"No se pudo enviar el correo: {error}")
+                    return redirect('listar_usuarios')
+                else:
+                    messages.error(request, f"No se pudo enviar el correo: {error}")
+                    return redirect('login')
         except IntegrityError :
-            messages.error(request, 'ERROR : El correo ya esta en uso ')
-            return redirect('login')
+                if rol == 'B'  or rol == 'A':
+                    messages.error(request, 'ERROR : El correo ya esta en uso ')
+                    return redirect('listar_usuarios')
+                else:
+                    messages.error(request, 'ERROR : El correo ya esta en uso ')
+                    return redirect('login')
+
         except Exception as error :
+            if rol == 'B' or rol == 'A' :
+                messages.error(request, f"ERROR: {error}")
+                return redirect('listar_usuarios')
+            else:
                 messages.error(request, f"ERROR: {error}")
                 return redirect('login')
+    # si por alguna razon se pone la ruta register que es la que esta en url esta protegida para que aparezca el index
     else:
-        consulta_roles = Usuarios.ROLES
-        contexto = {
-            'roles' : consulta_roles
-        }
-        return render (request,'index.html',contexto)
+        return render (request,'index.html')
 
 # Recuperacion de clave por token 
 def recueperar_password(request):

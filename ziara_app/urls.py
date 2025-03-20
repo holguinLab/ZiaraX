@@ -5,21 +5,15 @@ urlpatterns=[
     path('',index,name='index'),
     
     # PANEL DE SESION
-    path('login',login,name='login'),
+    path('login/',login,name='login'),
     path('register/',register,name='register'),
     
-    #  #-----> CRUD   PANEL ADMIN    <------- 
+    # PANEL ADMIN 
     path('admin_panel/',admin_panel,name='admin_panel'),
     
     # USUARIOS 
     path('listar_usuarios/',listar_usuarios,name='listar_usuarios'),
-    
-    # BARBEROS 
-    path('listar_barberos/',listar_barberos,name='listar_barberos'),
 
-    
-    
-    
     # PANEL DE USUARIO
     path('logout/',logout,name='logout'),
     path('recuperar_password/',recueperar_password,name='recuperar_password'),
