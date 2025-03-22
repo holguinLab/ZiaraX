@@ -26,6 +26,13 @@ from django.core.mail import send_mail
 def index(request):
     return render(request,'index.html')
 
+#region CLIENTES
+
+
+
+
+#endregion
+
 #region PROCESO DE IMAGENES
 def hacer_imagen_redonda(imagen, tamaño=(150, 150)):
     """
@@ -140,10 +147,7 @@ def nuevo_servicio(request):
     else:
         return redirect('listar_servicios')
 
-
-
-
-
+#BARBEROS
 def detalles_barberos(request,id_barbero):
     verificar = request.session.get('logueado',False)
     if verificar == False :
@@ -166,6 +170,7 @@ def detalles_barberos(request,id_barbero):
 #endregion
 
 #region PANEL DE SESION
+#Autenticar y redireccionar usuarios
 def login(request):
     if request.method == 'POST':
         #Obtener los valores ingresados en el HTML
@@ -225,6 +230,7 @@ def login(request):
             return redirect('index')
         return render(request,'panel/login.html')
 
+#Destruir sesion
 def logout(request):
     #si no esta logueado mostrar error y redirecciona al login
     verificar = request.session.get('logueado',False)
@@ -242,6 +248,7 @@ def logout(request):
             messages.info(request,f'Ocurrio Un Error Inesperado Intente Nuevamente Detalles: {e}')
         return redirect('index')
 
+#REGISTRAR USUARIOS
 def register(request):
     """
     Función para registrar nuevos usuarios en la plataforma (Clientes, Barberos y Administradores).
@@ -305,9 +312,6 @@ def register(request):
                     )
                     messages.success(request,"Administrador Agregado Correctamente")
                     new_admin.save()
-                # Si no es por que el rol es cliente 
-                
-                
                 # Envio de correo si el correo es gmail , si no es gmail o el correo no existe , de igual forma se crea el usuario
                 try:
                     html_message = f'''
@@ -376,6 +380,11 @@ def register(request):
                 q.save() # se guara el usuario que esta en la variable q en la BD si todo esta bien 
                 messages.success(request,"Cuenta Agregada Correctamente")
                 # SI se sube foto se procesa y se vuelve redonda y si no se sube predeterminada
+                if q.tipoUsuario == 'C' :
+                    nuevo_cliente = Clientes(
+                        usuario_cliente = q
+                    )
+                    nuevo_cliente.save()
                 if foto:
                     foto_procesada = hacer_imagen_redonda(foto)
                     q.foto.save(f"perfil_{q.email}.png", foto_procesada)
@@ -386,7 +395,7 @@ def register(request):
                         foto_procesada = hacer_imagen_redonda(default_image)
                         q.foto.save(f"perfil_{q.email}.png", foto_procesada)  # Guarda la imagen
                 # Envio de correo si el correo es gmail , si no es gmail o el correo no existe , de igual forma se crea el usuario
-                try:
+                """ try:
                     html_message = f'''
                     <p>👋 Hola, <strong>Colega </strong> Listo para un nuevo estilo !</p>
 
@@ -414,7 +423,7 @@ def register(request):
                     messages.success(request, "Correo enviado !!")
                 except Exception as error :
                     messages.error(request, f"No se pudo enviar el correo: {error}")
-                return redirect('login')
+                return redirect('login') """
             
             except IntegrityError :
                 messages.error(request, 'ERROR : El correo ya esta en uso ')
@@ -425,6 +434,7 @@ def register(request):
         else:
             return render (request,'index.html')
 
+#PERFIL
 def ver_perfil(request,id_usuario):
     verficar = request.session.get('logueado',False)
     if not verficar:
@@ -539,6 +549,7 @@ def recueperar_password(request):
     else:
         return render(request,'panel/recuperar_clave.html')
 
+#Verificacion de token 
 def verificacion_token_recuperar_password(request):
     verificar = request.session.get('logueado',False)
     if verificar:

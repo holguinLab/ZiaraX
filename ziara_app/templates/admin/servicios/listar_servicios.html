@@ -49,17 +49,21 @@
                 <form  action="" method="post">
                     {%csrf_token%}
                     <td style="display: none;">
+                        <p style="display: none;">{{servicio.id}}</p>
                         <input type="text" readonly name="id" value="{{servicio.id}}" class="form-control">
                     </td>
                 
                     <td>
+                        <p style="display: none;">{{servicio.nombre}}</p>
                         <input type="text" name="nombre" value="{{servicio.nombre}}" class="form-control">
                     </td>
                     
                     <td class="col-2">
+                        <p style="display: none;">{{servicio.precio}}</p>
                         <input type="text" name="precio" value="{{servicio.precio}}" class="form-control">
                     </td>
                     <td class="d-flex">
+                        <p style="display: none;">{{servicio.duracion}}</p>
                         <input type="text" name="duracion" value="{{servicio.duracion}}" class="form-control">
                     </td>
                     <td class="text-center ">
