@@ -71,7 +71,6 @@
 | `precio`    | DECIMAL(10,2) | Precio del servicio |
 
 ✅ **Sin relaciones externas.**  
-
 ---
 
 ### 🔹 **6. Citas**
@@ -84,7 +83,7 @@
 | `idBarbero` | INT (FK)     | Relación con `Barberos(idBarbero)` |
 | `idServicio` | INT (FK)    | Relación con `Servicios(idServicio)` |
 | `fechaHora` | DATETIME     | Fecha y hora de la cita |
-| `estado`    | ENUM('Pendiente', 'Confirmada', 'Cancelada', 'Completada') | Estado de la cita |
+| `estado`    | ENUM('Pendiente', 'Programada', 'Cancelada', 'Finalizada') | Estado de la cita |
 
 ✅ **Relaciones:**  
 - `Clientes (1 : N) Citas`  

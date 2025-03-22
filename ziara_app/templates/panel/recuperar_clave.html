@@ -7,15 +7,21 @@ Iniciar Sesión
 {% endblock %}
 
 {% block main %}
-<form  method="post"  enctype="multipart/form-data" class=" card dropdown-menu dropdown-menu-end p-4 row" style="min-width: 300px;">
-    {%csrf_token%}
-    <label for="email" class="form-label">Email</label>
-    <div class="input-group mb-3 col-12">
-        <span class="input-group-text" id="inputGroupPrepend">@</span>
-        <input type="text" name="email" class="form-control" id="email"
-            placeholder="JoeDoe@ejemplo.com" required>
-    </div>
+<form method="post" enctype="multipart/form-data" class="card dropdown-menu dropdown-menu-end p-4 row">
+    {% csrf_token %}
     
-    <button  type="submit" class="btn btn-outline-success   w-100 " >Verificar</button>
+    <!-- Label y Campo de Email -->
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <div class="input-group">
+            <span class="input-group-text" id="inputGroupPrepend">@</span>
+            <input type="text" name="email" class="form-control" id="email" placeholder="JoeDoe@ejemplo.com" required>
+        </div>
+    </div>
+
+    <!-- Botón de Enviar -->
+    <div>
+        <button type="submit" class="btn btn-outline-success w-100">Verificar</button>
+    </div>
 </form>
 {%endblock%}

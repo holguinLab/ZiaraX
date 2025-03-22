@@ -25,8 +25,25 @@ class Barberos(models.Model):
     usuario_barbero = models.ForeignKey('Usuarios',on_delete=models.CASCADE,related_name="barberos") 
     admin_creador = models.ForeignKey('Usuarios',on_delete=models.SET_NULL,null=True,related_name="barberos_creados") #Django podría lanzar advertencias si tienes múltiples ForeignKeys apuntando a Usuarios. related name ayuda para eso
     horario_trabajo = models.TextField(null=True,blank=True)
+    experiencia = models.IntegerField(null=True,blank=True,default=0)
     especialidad = models.CharField(max_length=200,null=True,blank=True)
 
 class Clientes(models.Model):
     usuario_cliente = models.ForeignKey('Usuarios',on_delete=models.CASCADE,related_name="clientes") 
 
+class Servicios(models.Model):
+    nombre = models.CharField(max_length=100)
+    precio = models.FloatField()
+    duracion = models.CharField(max_length=100)
+
+class Citas(models.Model):
+    cliente = models.ForeignKey('Clientes',on_delete=models.CASCADE,related_name="cita_cliente") 
+    barbero = models.ForeignKey('Barberos',on_delete=models.SET_NULL,null=True,related_name="cita_barbero") 
+    servicio = models.ForeignKey('Servicios',on_delete=models.CASCADE,related_name="cita_servicio")
+    ESTADOS =(
+        ("PEN","Pendiente"),
+        ("PRO","Programada"),
+        ("CAN","Cancelada"),
+        ("FIN","Finalizada"),
+    )
+    estado = models.CharField(max_length=4,choices=ESTADOS)

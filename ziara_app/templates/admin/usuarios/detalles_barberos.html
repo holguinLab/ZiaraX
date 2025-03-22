@@ -1,0 +1,47 @@
+{%extends 'admin/admin_base.html'%}
+{%load static%}
+{%block titulo%}Usuarios{%endblock%}
+{%block main%}
+<div class="container min-vh-100 d-flex m-2 gap-2 ">
+    <div class="row w-100 justify-content-center">
+        <!-- Tarjeta principal del barbero -->
+        <div class="col-12 col-md-8 col-lg-6 mx-auto">
+            <div class="card shadow-lg border-0 rounded-4 text-center p-4">
+                <img src="{{barbero.usuario_barbero.foto.url}}" class="rounded-circle mx-auto mt-3 border border-3 border-primary" 
+                    alt="Foto de perfil" width="140" height="140">
+                <div class="card-body">
+                    <h3 class="card-title fw-bold text-success">{{ barbero.usuario_barbero.nombre_completo }}</h3>
+                    <p class="card-text text-muted fs-5">Especialista en <strong>{{ barbero.especialidad }}</strong></p>
+                    <p class="card-text text-muted fs-5">Experiencia: <strong>{{ barbero.experiencia }} años</strong></p>
+                    <p class="card-text text-muted fs-5">Registrado por: <strong>{{ barbero.admin_creador.nombre_completo }} </strong></p>
+                    <hr class="my-3">
+                    <p class="card-text fs-5"><i class="bi bi-clock text-primary"></i> <strong>{{ barbero.horario_trabajo }}</strong></p>
+
+                </div>
+            </div>
+        </div>
+        
+        
+        <!-- Tarjetas secundarias -->
+        <div class="col-12 col-md-6">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow-sm border-0 rounded mb-3 p-3">
+                        <h5 class="card-title">Cortes totales este mes</h5>
+                        <p class="display-5 fw-bold">85</p>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="card shadow-sm border-0 rounded p-3">
+                        <h5 class="card-title">Clientes recurrentes</h5>
+                        <p class="display-6 fw-bold">30</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{%endblock%}

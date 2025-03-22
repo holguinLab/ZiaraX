@@ -9,5 +9,20 @@ class adminUsuarios(admin.ModelAdmin):
 
 @admin.register(Barberos)
 class adminBarberos(admin.ModelAdmin):
-    list_display=['id','usuario_barbero','admin_creador','horario_trabajo','especialidad']
-    list_editable=['usuario_barbero','admin_creador','horario_trabajo','especialidad']
+    list_display=['id','usuario_barbero','admin_creador','horario_trabajo','especialidad','experiencia']
+    list_editable=['usuario_barbero','admin_creador','horario_trabajo','especialidad','experiencia']
+
+@admin.register(Servicios)
+class adminServicios(admin.ModelAdmin):
+    list_display=['id','nombre','precio','duracion']
+    list_editable=['nombre','precio','duracion']
+
+@admin.register(Citas)
+class adminCitas(admin.ModelAdmin):
+    list_display=['id','cliente','barbero','servicio','estado']
+    list_editable=['cliente','barbero','servicio','estado']
+    
+@admin.register(Clientes)
+class adminClientes(admin.ModelAdmin):
+    list_display=['id','usuario_cliente']
+    list_editable=['usuario_cliente']

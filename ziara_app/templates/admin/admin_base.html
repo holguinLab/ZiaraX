@@ -56,7 +56,7 @@
             <button class="btn btn-dark d-lg-none m-2" type="button" data-bs-toggle="offcanvas"data-bs-target="#sidebarMenu"><i class="bi bi-list"></i> Menú</button>
 
             <!-- Logo -->
-            <a class="navbar-brand text-light pt-0" href="{% url 'admin_panel'%}">
+            <a class="navbar-brand text-light pt-0" href="{%url 'ver_perfil' request.session.logueado.id%}">
                 <img src="{% static 'img/logo5.png' %}" alt="Ziara Logo" width="110">
             </a>
 
@@ -78,8 +78,8 @@
                             {%endif%}
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#">Editar Perfil</a></li>
-                            <li><a class="dropdown-item" href="#">Cambiar Contraseña</a></li>
+                            <li><a class="dropdown-item" href="{%url 'ver_perfil' request.session.logueado.id%}">Editar Perfil</a></li>
+                            <li><a class="dropdown-item" href="{%url 'recuperar_password'%}">Cambiar Contraseña</a></li>
                         </ul>
                     </div>
                 </ul>
@@ -127,7 +127,7 @@
             <a href="{%url 'admin_panel'%}"><i class="bi bi-house-door"></i> Inicio</a>
             <a href="{%url 'listar_usuarios'%}"><i class="bi bi-person-badge"></i> Usuarios</a>
             <a href="#"><i class="bi bi-calendar-check"></i> Citas</a>
-            <a href="#"><i class="bi bi-scissors"></i> Servicios</a>
+            <a href="{%url 'listar_servicios'%}"><i class="bi bi-scissors"></i> Servicios</a>
             <a href="#"><i class="bi bi-box-seam"></i> Productos</a>
             <a href="#"><i class="bi bi-gear"></i> Configuración</a>
             <hr>

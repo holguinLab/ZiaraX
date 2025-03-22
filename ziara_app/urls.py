@@ -13,9 +13,15 @@ urlpatterns=[
     
     # USUARIOS 
     path('listar_usuarios/',listar_usuarios,name='listar_usuarios'),
+    path('detalles_barberos/<int:id_barbero>/',detalles_barberos,name='detalles_barberos'),
+    
+    #SERVICIOS
+    path('listar_servicios/',listar_servicios,name='listar_servicios'),
+    path('nuevo_servicio/',nuevo_servicio,name='nuevo_servicio'),
 
     # PANEL DE USUARIO
     path('logout/',logout,name='logout'),
     path('recuperar_password/',recueperar_password,name='recuperar_password'),
-    path('verificacion_token_recuperar_password/',verificacion_token_recuperar_password,name='verificacion_token_recuperar_password')
+    path('verificacion_token_recuperar_password/',verificacion_token_recuperar_password,name='verificacion_token_recuperar_password'),
+    path('ver_perfil/<int:id_usuario>/',ver_perfil,name='ver_perfil'),
 ]
