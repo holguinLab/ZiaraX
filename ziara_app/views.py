@@ -4,6 +4,7 @@ from django.contrib import messages
 from .models import * # Importacion de todos los modelos en models.py
 from .utils import * # Importacion de la funcion de incriptacion y verificacion del archivo utils.py
 from django.db import IntegrityError
+from django.http import JsonResponse # para convertir la lista de notificacines en un json para trabajarla con ajax
 
 # region PILLOW # ! Librerias Para usar PILLOW 🏙️ 
 from django.core.files.base import ContentFile
@@ -647,3 +648,23 @@ def verificacion_token_recuperar_password(request):
 #'('email', 'password', 'nombre_completo', 'telefono', 'f_nacimiento', 'foto', 'tipoUsuario', )'
 #endregion
 
+#region NOTIFICACIONES
+
+#PARA EL PANEL ADMIN
+def ultimos_datos_admin(request):
+    notificaciones = []
+    verificar = request.session.get('logueado',False)
+    if not verificar :
+        messages.info(request,'❌ERROR : Debes iniciar sesion primero')
+        return redirect('index')
+    elif verificar['rol'] != 'A':
+        messages.info(request,'❌ERROR : No tienes los permisos necesarios')
+        return redirect('index')
+    usuarios = Usuarios.objects.order_by('-id')[:2]
+    for usuario in usuarios:
+        notificaciones.append(f'{usuario.nombre_completo} Se ha registrado')
+    return JsonResponse({'notificaciones':notificaciones})
+
+
+
+#endregion
