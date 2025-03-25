@@ -59,28 +59,43 @@
             <a class="navbar-brand text-light pt-0" href="{%url 'ver_perfil' request.session.logueado.id%}">
                 <img src="{% static 'img/logo5.png' %}" alt="Ziara Logo" width="110">
             </a>
-
-            <h2 class="fw-bold"><span style="color: #388E3B;">Ziara</span> Administración</h2>
-
+            <div>
+                <h2 class="fw-bold"><span style="color: #388E3B;">Ziara</span> Administración</h2>            
+                <a style="color: #1A1A1A;" class="nav-link active" href="{% url 'index' %}">Ver Sitio Web</a>
+            </div>
             <!-- Menú colapsable -->
             <div class="collapse navbar-collapse pt-0" id="navbarTogglerDemo01">
                 <ul class="navbar-nav ms-auto mb-lg-0 gap-2">
-                    <li class="nav-item">
-                        <a style="color: #1A1A1A;" class="nav-link active" href="{% url 'index' %}">Sitio Web</a>
-                    </li>
-                    <div class="dropdown">
-                        <button class="btn btn-success dropdown-toggle" type="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            {%if request.session.logueado.username == '' or request.session.logueado.username == None %}
-                                Perfil
-                            {%else%}
-                                {{request.session.logueado.username}}
-                            {%endif%}
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{%url 'ver_perfil' request.session.logueado.id%}">Editar Perfil</a></li>
-                            <li><a class="dropdown-item" href="{%url 'recuperar_password'%}">Cambiar Contraseña</a></li>
-                        </ul>
+                    <div class="d-flex  align-items-center">
+                        <li>
+                            <div class="dropdown me-4">
+                                <button class="btn btn-transparent  position-relative dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border: none;">
+                                    🔔
+                                    <span id="contador-notificaciones" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" >
+                                        0
+                                    </span>
+                                </button>
+                                <ul id="lista-notificaciones" class="dropdown-menu dropdown-menu-end">
+                                    <li class="dropdown-item text-muted">Sin notificaciones</li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="navbar-brand" href="{%url 'ver_perfil' request.session.logueado.id%}">
+                                <img src="{{ request.session.logueado.foto }}" alt="Foto de Perfil" width="40" height="40" class="d-inline-block rounded-circle">
+                            </a>
+                        </li>
+                        
+                        <div class="dropdown">
+                            <button class="btn btn-success dropdown-toggle btn-sm" type="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                    Perfil
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{%url 'ver_perfil' request.session.logueado.id%}">Editar Perfil</a></li>
+                                <li><a class="dropdown-item" href="{%url 'recuperar_password'%}">Cambiar Contraseña</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </ul>
             </div>

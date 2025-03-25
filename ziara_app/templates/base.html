@@ -124,29 +124,28 @@
                         </div>
                         {%elif not request.session.logueado.rol == 'A' %}
                             <div class="dropdown">
-                                <a class="navbar-brand" href="{%url 'ver_perfil' request.session.logueado.id%}">
-                                    <img src="{{ request.session.logueado.foto }}" alt="Foto de Perfil" width="40" height="40" class="d-inline-block rounded-circle">
-                                </a>
-                                <button class="btn btn-success dropdown-toggle" type="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    {%if request.session.logueado.username == '' or request.session.logueado.username == None %}
-                                        Perfil
-                                    {%else%}
-                                        {{request.session.logueado.username}}
-                                    {%endif%}
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="{%url 'ver_perfil' request.session.logueado.id%}">Editar Perfil</a></li>
-                                    <li><a class="dropdown-item" href="#">Configuración</a></li>
-                                    <li><a class="dropdown-item" href="{%url 'recuperar_password'%}">Cambiar Contraseña</a></li>
-                                    <li><a class="dropdown-item" href="#">Mis Citas</a></li>  <!-- Si aplicas esto en Ziara -->
-                                    <li><a class="dropdown-item" href="#">Historial de Pagos</a></li> 
-                                    <hr>
-                                    <li><a class="dropdown-item text-danger" href="{%url 'logout'%}">Cerrar Sesión</a></li>
-                                </ul>
+                                <div class="align-items-center">
+                                    <a class="navbar-brand" href="{%url 'ver_perfil' request.session.logueado.id%}">
+                                        <img src="{{ request.session.logueado.foto }}" alt="Foto de Perfil" width="40" height="40" class="d-inline-block rounded-circle">
+                                    </a>
+                                    <button class="btn btn-success dropdown-toggle btn-sm" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                            Perfil
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{%url 'ver_perfil' request.session.logueado.id%}">Editar Perfil</a></li>
+                                        <li><a class="dropdown-item" href="#">Configuración</a></li>
+                                        <li><a class="dropdown-item" href="{%url 'recuperar_password'%}">Cambiar Contraseña</a></li>
+                                        <li><a class="dropdown-item" href="#">Mis Citas</a></li>  <!-- Si aplicas esto en Ziara -->
+                                        <li><a class="dropdown-item" href="#">Historial de Pagos</a></li> 
+                                        <hr>
+                                        <li><a class="dropdown-item text-danger" href="{%url 'logout'%}">Cerrar Sesión</a></li>
+                                    </ul>
+                                </div>
+                                
                             </div>
                         {%else%}
-                            <a href="{%url 'admin_panel'%}" class="btn btn-success">Ziara Admin </a>
+                            <a href="{%url 'admin_panel'%}" class="btn btn-success btn-sm">Ziara Admin </a>
                         {%endif%}
                         </div>
                     </li>
