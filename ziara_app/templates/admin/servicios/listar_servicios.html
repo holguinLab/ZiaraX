@@ -40,6 +40,7 @@
                 <th class="text-center">Nombre</th>
                 <th class="text-center" >Precio</th>
                 <th class="text-center" >Duracion</th>
+                <th class="text-center" >Categoria</th>
                 <th class="text-center" >Acciones</th>
             </tr>
         </thead>
@@ -66,12 +67,20 @@
                         <p style="display: none;">{{servicio.duracion}}</p>
                         <input type="text" name="duracion" value="{{servicio.duracion}}" class="form-control">
                     </td>
+                    <td class="">
+                        <p style="display: none;">{{servicio.get_categoria_display}}</p>
+                        <select class="form-select "  name="categoria" id="categoria" >
+                            <option value="{{servicio.categoria}}">{{servicio.get_categoria_display}}</option >
+                            {%for categoria , etiqueta in categorias%}
+                            <option value="{{categoria}}">{{etiqueta}}</option >
+                            {%endfor%}
+                        </select>
+                    </td>
                     <td class="text-center ">
                         <button type="submit" class="text-center text-success fs-5 " style="border: none; background-color: transparent;" ><i class="bi bi-floppy-fill"></i></button>
                         <a class="text-danger fw-bold fs-5" href=""><i class="bi bi-trash3-fill"></i></a>
                     </td>
                 </form>
-                
             </tr>
             {%endfor%}
         </tbody>

@@ -1,0 +1,127 @@
+{%extends 'base.html'%}
+{%load static%}
+{%block titulo %}Resevar{%endblock%}
+{%block estilos%}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css" rel="stylesheet">
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+<style>
+.sidebar a {
+    color: #263238;
+    padding: 10px 15px;
+    text-decoration: none;
+}
+</style>
+{%endblock%}
+
+{%block main%}
+<form action="{% url 'registrar_citas' %}" method="post">
+    <input id="fechaSeleccionada" type="date" name="fecha" style="display: none;">
+    {% csrf_token %}
+    <div class="container mt-3">
+        <div class="row m-0">
+            <!-- Calendario -->
+            <div class="col-md-6">
+                <div id="calendar"></div>
+            </div>
+            
+            <div class="col-md-6">
+                <h5 class="text-center">Selecciona un Servicio:</h5>
+                <div class="d-flex justify-content-around gap-2 mt-3" style="flex-wrap: wrap;">
+                    
+                    {% for servicio in servicios %}
+                    <div class="card shadow-lg rounded-4" style="width: 200px;">
+                        <div class="card-body text-center">
+                            <div class="form-check text-end">
+                                <input class="form-check-input" type="checkbox" name="servicio" value="{{ servicio.id }}">
+                            </div>
+                            <h5 class="card-title">{{ servicio.nombre }}</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ servicio.precio }}</h6>
+                            <p class="card-text">Incluye lavado, corte y peinado con cera.</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="mt-5">
+                    <h5 class="text-center">Selecciona un Barbero</h5>
+                    <div class="d-flex justify-content-around gap-2 " style="flex-wrap: wrap;">
+                        {% for barbero in barberos %}
+                        <div class="card col-md-6 rounded-4 p-2 text-center" style="width: 200px;">
+                            <img src="{{ barbero.usuario_barbero.foto.url }}" style="height: 150px; width: 150px;"
+                                class="card-img-top rounded-circle mx-auto d-block" alt="foto barbero">
+                            <h6 class="mt-2">{{ barbero.usuario_barbero.nombre_completo }}</h6>
+                            <input type="radio" name="barbero" value="{{ barbero.id }}" class="form-check-input">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-lg btn-primary" type="submit">RESERVAR</button>
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+        
+    </div>
+</form>
+
+<!-- Mapa al final -->
+<div class="row mt-3">
+    <div class="col-12">
+        <div id="map" style="height: 300px;"></div>
+    </div>
+</div>
+
+{%endblock%}
+
+
+
+{%block js%}
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(function () { // Retraso para asegurar que el DOM está listo
+            let calendarEl = document.getElementById('calendar');
+            if (!calendarEl) {
+                console.error("No se encontró el elemento #calendar");
+                return;
+            }
+
+            let calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                selectable: true,
+                height: 'auto', // Ajusta la altura automáticamente
+                dateClick: function (info) {
+                    document.getElementById('fechaSeleccionada').value = info.dateStr; // AGREGA FECHA SELECCIONADA AL INPUT
+                    alert('Has seleccionado: ' + info.dateStr);
+                }
+            });
+
+            calendar.render();
+        }, 500); // Espera 500ms para asegurar carga del DOM
+    });
+
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Crear el mapa y centrarlo en una ubicación (Lat, Lng)
+        let map = L.map('map').setView([6.2442, -75.5812], 13); // Medellín
+
+        // Agregar capa de OpenStreetMap (100% gratis)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Agregar un marcador en la ubicación de la barbería
+        L.marker([6.2442, -75.5812]).addTo(map)
+            .bindPopup('Aquí está tu barbería en Medellín!')
+            .openPopup();
+    });
+
+
+</script>
+{%endblock%}

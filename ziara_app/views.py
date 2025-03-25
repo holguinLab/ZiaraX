@@ -26,11 +26,46 @@ from django.core.mail import send_mail
 def index(request):
     return render(request,'index.html')
 
+
 #region CLIENTES
 
+#BASE DE RESERVAS 
+def reservas_citas (request):
+    barberos = Barberos.objects.all()
+    servicios = Servicios.objects.all()
+    contexto ={
+        'barberos' : barberos,
+        'servicios' :servicios
+    }
+    return render(request,'reservas/reservas_citas.html',contexto) 
 
 
-
+def registrar_citas(request):
+    verificar = request.session.get('logueado',False)
+    if request.method == 'POST' :
+        if verificar:
+            usuario = Usuarios.objects.get(pk = verificar['id'])
+            cliente = Clientes.objects.get(usuario_cliente = usuario)
+            
+            barbero_id = request.POST.get('barbero')  # Recibir el ID del barbero
+            barbero = Barberos.objects.get(pk=barbero_id)
+            
+            servicio_id = request.POST.get('servicio')  # Recibir el ID del servicio
+            servicio = Servicios.objects.get(pk=servicio_id)
+            
+            q = Citas(
+                servicio=servicio,
+                barbero=barbero,
+                cliente=cliente,
+                estado='PEN',
+                fecha = request.POST.get('fecha')
+            )
+            q.save()
+            return redirect('index')
+        else:
+            messages.info(request,'❌ ERROR : Debes iniciar sesion primero o registrarte')
+            return redirect('login')
+    return redirect('index')
 #endregion
 
 #region PROCESO DE IMAGENES
@@ -107,6 +142,7 @@ def listar_servicios(request):
             servicio.nombre = request.POST.get('nombre')
             servicio.precio = request.POST.get('precio')
             servicio.duracion = request.POST.get('duracion')
+            servicio.categoria = request.POST.get('categoria')
             servicio.save()
             messages.success(request,'✅ Servicio Actualizado Correctamente')
             return redirect('listar_servicios')
@@ -117,8 +153,10 @@ def listar_servicios(request):
         return redirect('listar_servicios')
     else:
         servicios = Servicios.objects.all()
+        categorias = Servicios.CATEGORIAS
         contexto ={
-            'servicios' : servicios
+            'servicios' : servicios,
+            'categorias' : categorias,
         }
         return render(request,'admin/servicios/listar_servicios.html',contexto)
 
@@ -166,6 +204,22 @@ def detalles_barberos(request,id_barbero):
         except Exception as e:
             messages.error(request,f'ERROR : {e}')
             return redirect('listar_usuarios')
+
+
+#CITAS
+def listar_citas(request):
+    verificar = request.session.get('logueado',False)
+    if not verificar :
+        messages.error(request,' ❌ ERROR : Debes iniciar sesion primero')
+        return redirect('index')
+    elif not verificar['rol'] == 'A' :
+        messages.error(request,' ❌ ERROR : No Tienes Permisos necesarios')
+        return redirect('index')
+    q = Citas.objects.all()
+    contexto = {
+        'citas' : q
+    }
+    return render(request,'admin/citas/listar_citas.html',contexto)
 
 #endregion
 
@@ -395,7 +449,7 @@ def register(request):
                         foto_procesada = hacer_imagen_redonda(default_image)
                         q.foto.save(f"perfil_{q.email}.png", foto_procesada)  # Guarda la imagen
                 # Envio de correo si el correo es gmail , si no es gmail o el correo no existe , de igual forma se crea el usuario
-                """ try:
+                try:
                     html_message = f'''
                     <p>👋 Hola, <strong>Colega </strong> Listo para un nuevo estilo !</p>
 
@@ -423,7 +477,7 @@ def register(request):
                     messages.success(request, "Correo enviado !!")
                 except Exception as error :
                     messages.error(request, f"No se pudo enviar el correo: {error}")
-                return redirect('login') """
+                return redirect('login')
             
             except IntegrityError :
                 messages.error(request, 'ERROR : El correo ya esta en uso ')

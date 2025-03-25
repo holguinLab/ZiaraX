@@ -18,10 +18,21 @@ urlpatterns=[
     #SERVICIOS
     path('listar_servicios/',listar_servicios,name='listar_servicios'),
     path('nuevo_servicio/',nuevo_servicio,name='nuevo_servicio'),
+    
+    #CITAS 
+    path('listar_citas/',listar_citas,name='listar_citas'),
 
+
+
+    #RESERVAS 
+    path('reservas_citas/',reservas_citas,name='reservas_citas'),
+    path('registrar_citas/',registrar_citas,name='registrar_citas'),
+    
+    
     # PANEL DE USUARIO
     path('logout/',logout,name='logout'),
     path('recuperar_password/',recueperar_password,name='recuperar_password'),
     path('verificacion_token_recuperar_password/',verificacion_token_recuperar_password,name='verificacion_token_recuperar_password'),
     path('ver_perfil/<int:id_usuario>/',ver_perfil,name='ver_perfil'),
 ]
+

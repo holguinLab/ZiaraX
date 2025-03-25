@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 # Create your models here.
 
 class Usuarios(models.Model):
@@ -16,6 +17,9 @@ class Usuarios(models.Model):
     )
     tipoUsuario = models.CharField(max_length=2,choices=ROLES,default='C')
     token_recuperar_clave = models.CharField(max_length=6 , default='')
+    
+    def __str__(self):
+        return f' {self.nombre_completo} - {self.email}'
 
 
 class Administradores(models.Model):
@@ -27,19 +31,34 @@ class Barberos(models.Model):
     horario_trabajo = models.TextField(null=True,blank=True)
     experiencia = models.IntegerField(null=True,blank=True,default=0)
     especialidad = models.CharField(max_length=200,null=True,blank=True)
+    
+    def __str__(self):
+        return f' {self.usuario_barbero} '
 
 class Clientes(models.Model):
     usuario_cliente = models.ForeignKey('Usuarios',on_delete=models.CASCADE,related_name="clientes") 
+    
+    def __str__(self):
+        return f' {self.usuario_cliente} '
 
 class Servicios(models.Model):
     nombre = models.CharField(max_length=100)
     precio = models.FloatField()
     duracion = models.CharField(max_length=100)
+    CATEGORIAS = (
+        ("B","Barba"),
+        ("C","Cabello"),
+        ("S","Spa"),
+    )
+    categoria = models.CharField(max_length=1,choices=CATEGORIAS,default='')
+    def __str__(self):
+        return f' {self.nombre} '
 
 class Citas(models.Model):
     cliente = models.ForeignKey('Clientes',on_delete=models.CASCADE,related_name="cita_cliente") 
     barbero = models.ForeignKey('Barberos',on_delete=models.SET_NULL,null=True,related_name="cita_barbero") 
     servicio = models.ForeignKey('Servicios',on_delete=models.CASCADE,related_name="cita_servicio")
+    fecha = models.DateField(default=now ,null=True,blank=True)
     ESTADOS =(
         ("PEN","Pendiente"),
         ("PRO","Programada"),
@@ -47,3 +66,6 @@ class Citas(models.Model):
         ("FIN","Finalizada"),
     )
     estado = models.CharField(max_length=4,choices=ESTADOS)
+    
+    def __str__(self):
+        return f' {self.cliente} - {self.barbero} - {self.servicio}'

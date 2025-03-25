@@ -108,13 +108,20 @@
         </div>
         <div class="offcanvas-body bg-dark text-white">
             <nav class="nav flex-column">
-                <a class="nav-link text-light" href="#"><i class="bi bi-house-door"></i> Inicio</a>
-                <a class="nav-link text-light" href="#"><i class="bi bi-calendar-check"></i> Citas</a>
-                <a class="nav-link text-light" href="#"><i class="bi bi-person"></i> Clientes</a>
-                <a class="nav-link text-light" href="#"><i class="bi bi-scissors"></i> Servicios</a>
+                <a class="nav-link text-light" href="{%url 'admin_panel'%}"><i class="bi bi-grid"></i> Dashboard</a>
+                <a class="nav-link text-light" href="{%url 'admin_panel'%}"><i class="bi bi-house-door"></i> Inicio</a>
+                <a class="nav-link text-light" href="{%url 'listar_usuarios'%}"><i class="bi bi-person-badge"></i> Usuarios</a>
+                <a class="nav-link text-light" href="{%url 'listar_citas'%}"><i class="bi bi-calendar-check"></i> Citas</a>
+                <a class="nav-link text-light" href="{%url 'listar_servicios'%}"><i class="bi bi-scissors"></i> Servicios</a>
                 <a class="nav-link text-light" href="#"><i class="bi bi-gear"></i> Configuración</a>
+
+                <a class="nav-link text-light" href="{%url 'ver_perfil' request.session.logueado.id%}"><i class="bi bi-scissors"></i> Editar Perfil</a>
+
+                <a class="nav-link text-light" href="{%url 'recuperar_password'%}"><i class="bi bi-scissors"></i> Cambiar Contraseña</a>
+                
                 <hr class="text-light">
                 <a class="nav-link text-danger" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                
             </nav>
         </div>
     </div>
@@ -126,7 +133,7 @@
             <a href="{%url 'admin_panel'%}"><i class="bi bi-grid"></i> Dashboard</a>
             <a href="{%url 'admin_panel'%}"><i class="bi bi-house-door"></i> Inicio</a>
             <a href="{%url 'listar_usuarios'%}"><i class="bi bi-person-badge"></i> Usuarios</a>
-            <a href="#"><i class="bi bi-calendar-check"></i> Citas</a>
+            <a href="{%url 'listar_citas'%}"><i class="bi bi-calendar-check"></i> Citas</a>
             <a href="{%url 'listar_servicios'%}"><i class="bi bi-scissors"></i> Servicios</a>
             <a href="#"><i class="bi bi-box-seam"></i> Productos</a>
             <a href="#"><i class="bi bi-gear"></i> Configuración</a>
