@@ -20,7 +20,7 @@
     <input id="fechaSeleccionada" type="date" name="fecha" style="display: none;">
     {% csrf_token %}
     <div class="container mt-3">
-        <div class="row m-0">
+        <div class="row m-0 ">
             <!-- Calendario -->
             <div class="col-md-6">
                 <div id="calendar"></div>
@@ -68,7 +68,7 @@
 </form>
 
 <!-- Mapa al final -->
-<div class="row mt-3">
+<div class="row m-0">
     <div class="col-12">
         <div id="map" style="height: 300px;"></div>
     </div>
@@ -102,7 +102,7 @@
             });
 
             calendar.render();
-        }, 500); // Espera 500ms para asegurar carga del DOM
+        }, 500); // Espera 500ms para asegurar carga del DOM y vuelve y repite 
     });
 
 

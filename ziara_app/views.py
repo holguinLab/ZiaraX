@@ -33,14 +33,14 @@ def index(request):
 #MUESTRA EL HTML CON EL CALENDARIO , BARBEROS Y SERVICIOS
 def reservas_citas (request):
     verificar = request.session.get('logueado',{})
-    if not verificar :
+    if not verificar or verificar:
         barberos = Barberos.objects.all()
         servicios = Servicios.objects.all()
         contexto ={
             'barberos' : barberos,
             'servicios' :servicios
         }
-        return render(request,'reservas/reservas_citas.html',contexto) 
+        return render(request,'reservas/reservas_citas.html',contexto)
     if verificar.get('rol') != 'C':
         messages.info(request,'❌ ERROR :No Puedes Hacer Esto')
         return redirect('index')
