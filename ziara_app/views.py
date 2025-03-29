@@ -1,5 +1,5 @@
 # Importacion de librerias
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib import messages 
 from .models import * # Importacion de todos los modelos en models.py
 from .utils import * # Importacion de la funcion de incriptacion y verificacion del archivo utils.py
@@ -25,7 +25,12 @@ from django.core.mail import send_mail
 
 # Esta funcion solo muestra el index.html cuando se llama 
 def index(request):
-    return render(request,'index.html')
+    carrito_id = request.session.get('carrito_servicios',[])
+    carrito_servicios = Servicios.objects.filter(id__in = carrito_id) # Filter devuelve una lista 
+    contexto = {
+        'carrito_servicios' :carrito_servicios
+    }
+    return render(request,'index.html',contexto)
 
 
 #region CLIENTES
@@ -33,43 +38,136 @@ def index(request):
 #MUESTRA EL HTML CON EL CALENDARIO , BARBEROS Y SERVICIOS
 def reservas_citas (request):
     verificar = request.session.get('logueado',{})
+    carrito_id = request.session.get('carrito_servicios',[])
     if not verificar or verificar:
+        
         barberos = Barberos.objects.all()
         servicios = Servicios.objects.all()
+        carrito_id = request.session.get('carrito_servicios',[])
+        carrito_servicios = Servicios.objects.filter(id__in = carrito_id) # filter devuelve una lista 
+        
         contexto ={
             'barberos' : barberos,
-            'servicios' :servicios
+            'servicios' :servicios,
+            'carrito_servicios' :carrito_servicios
         }
         return render(request,'reservas/reservas_citas.html',contexto)
     if verificar.get('rol') != 'C':
         messages.info(request,'❌ ERROR :No Puedes Hacer Esto')
         return redirect('index')
 
+def agregar_servicio_carrito(request,servicio_id): # servicio_id que viene del html
+    # Si no hay session de loguedo aparece un errro y redirije a index
+    verificar = request.session.get('logueado',False)
+    if not verificar:
+        messages.warning(request,'❌ ERROR : No Tienes Permitido Hacer Esto')
+        return redirect('index')
+    #Si la session tiene como rol administrador o barbero tampoco tendra permitido agregar servicios al carrito
+    elif verificar['rol'] != 'C':
+        messages.warning(request,'❌ ERROR : No Tienes Permitido Hacer Esto')
+        return redirect('index')
+    try:
+        #Se obtiene y se compara el servicio con el id del servicio en el modelo con el id  que se ingresa en el html
+        # servicio = Servicios.objects.get(id=servicio_id) es lo mismo que usar la funcion get_objects_404
+        servicio = get_object_or_404(Servicios,id=servicio_id)
+        
+        #Si no hay una sesion con el nombre carrito_servicios
+        if 'carrito_servicios' not in request.session:
+            request.session['carrito_servicios'] = [] #Creamos la sesion carrito_servicios que sera igual a una lista vacia
+        
+        carrito = request.session['carrito_servicios'] #asigno una variable a esa sesion que creamos en este caso la llame igual
+        
+        #si el servicio_id no esta en la lista carrito se agrega , asi se evitan duplicados de servicios
+        if servicio_id not in carrito:
+            carrito.append(servicio_id)
+        
+        request.session["carrito_servicios"] = carrito  # Guardar en sesión
+        return redirect('reservas_citas')
+    #Exepcion si el id ingresado en l html no se encuentra en el id del modelo 
+    except Servicios.DoesNotExist:
+        messages.info(request,'❌ ERROR : No Hay Datos Asociados')
+    except Exception as e:
+        messages.info(request,f'❌ ERROR : {e}')
+    return redirect('index')
+
+def eliminar_elementos_carrito(request,servicio_id):
+    #Creacion de varible para saber si dentro de la sesiones hay una que se llama carrito_servicios
+    verificar_carrito = request.session.get('carrito_servicios',False)
+    #creacion de variable para saber si dentro de las sesiones hay una que se llama logueado 
+    verificar = request.session.get('logueado',False)
+    if not verificar :
+        messages.error(request,'❌ ERROR: No Tienes Permitido Hacer esto')
+        return redirect('index')
+    elif verificar['rol'] != 'C':
+        messages.error(request,'❌ ERROR: No Tienes Permitido Hacer esto')
+        return redirect('index')
+    try:
+        if verificar_carrito: # si existe guardo la sesion en una varible 
+            carrito_servicios = request.session['carrito_servicios']
+            # comparo si el id que se obtiene desde el html esta en la lista de carrito_servicios
+            if servicio_id in carrito_servicios :
+                #Si esta uso el metdo de listas romove para eliminarlo
+                carrito_servicios.remove(servicio_id)
+                #Guardar los cambios en la sesion llamada carrito_servicios 
+                request.session['carrito_servicios'] = carrito_servicios
+        # Redirige a la página anterior (o a 'index' si no hay referencia)
+        return redirect(request.META.get('HTTP_REFERER', 'index'))
+    except Servicios.DoesNotExist:
+        messages.error(request,f'❌ ERROR : No Hay Datos Asociados')
+    except Exception as e:
+        messages.error(request,f'❌ ERROR : {e}')
+    return redirect('index')
+
 #REISTRA LAS CITAS CON LA SELECCION ANTERIOR
 def registrar_citas(request):
     verificar = request.session.get('logueado',False)
+    verificar_carrito = request.session.get('carrito_servicios',False)
     if request.method == 'POST' :
-        if verificar:
+        if verificar and verificar['rol'] == 'C':
             usuario = Usuarios.objects.get(pk = verificar['id'])
             cliente = Clientes.objects.get(usuario_cliente = usuario)
             
             barbero_id = request.POST.get('barbero')  # Recibir el ID del barbero
             barbero = Barberos.objects.get(pk=barbero_id)
             
-            servicio_id = request.POST.get('servicio')  # Recibir el ID del servicio
-            servicio = Servicios.objects.get(pk=servicio_id)
-            
-            q = Citas(
-                servicio=servicio,
-                barbero=barbero,
-                cliente=cliente,
-                estado='PEN',
-                fecha = request.POST.get('fecha')
-            )
-            q.save()
+            try:
+                cita = Citas(
+                    barbero=barbero,
+                    cliente=cliente,
+                    estado='PEN',
+                    fecha = request.POST.get('fecha')
+                )
+                cita.save()
+                # si hay  una session con carrito_servicios si no redirigimos
+                if verificar_carrito:
+                    #recorremos la lista
+                    print(verificar_carrito)
+                    for servicio_id in request.session['carrito_servicios']:
+                        servicio = Servicios.objects.get(id = servicio_id)
+                        #Creamos la cita servicio con la instancia de la cita de arriba y el servicio
+                        cita_servicio = CitaServicios(
+                            cita = cita,
+                            servicio = servicio
+                        )
+                        cita_servicio.save()
+                    #vaciamos el carrito con los servicios cuanto se agrega a cita servicios
+                    request.session['carrito_servicios'] = []
+                    messages.success(request,'Su cita a sido agendada correctamente')
+                    return redirect('index')
+                return redirect('index')
+            except Citas.DoesNotExist:
+                messages.warning(request,'❌ ERROR :No hay Datos Asociados')
+            except Usuarios.DoesNotExist:
+                messages.warning(request,'❌ ERROR :No hay Datos Asociados')
+            except Barberos.DoesNotExist:
+                messages.warning(request,'❌ ERROR :No hay Datos Asociados')
+            except Servicios.DoesNotExist:
+                messages.warning(request,'❌ ERROR :No hay Datos Asociados')
+            except Exception as e:
+                messages.warning(request,f'❌ ERROR :{e}')
             return redirect('index')
         else:
-            messages.info(request,'❌ ERROR : Debes iniciar sesion primero o registrarte')
+            messages.info(request,'❌ ERROR : No Tienes Permitido Hacer Esto')
             return redirect('login')
     return redirect('index')
 #endregion
@@ -223,9 +321,10 @@ def listar_citas(request):
         return redirect('index')
     q = Citas.objects.all()
     contexto = {
-        'citas' : q
+        'citas' : q,
     }
     return render(request,'admin/citas/listar_citas.html',contexto)
+
 
 #endregion
 

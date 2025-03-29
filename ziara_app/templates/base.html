@@ -107,9 +107,6 @@
                                     </div>
                                     {%endif%}
                                     
-
-                                    
-
                                     <div class="mb-3">
                                         <div class="form-check text-primary">
                                             <input type="checkbox" class="form-check-input" id="dropdownCheck2">
@@ -123,12 +120,12 @@
                             {%endif%}
                         </div>
                         {%elif not request.session.logueado.rol == 'A' %}
-                            <div class="dropdown">
-                                <div class="align-items-center">
-                                    <a class="navbar-brand" href="{%url 'ver_perfil' request.session.logueado.id%}">
-                                        <img src="{{ request.session.logueado.foto }}" alt="Foto de Perfil" width="40" height="40" class="d-inline-block rounded-circle">
-                                    </a>
-                                    <button class="btn btn-success dropdown-toggle btn-sm" type="button"
+                            <div class="d-flex justify-content-around">
+                                <div>
+                                    <!-- Carrito -->
+                                    {%block carrito%}{%endblock%}
+
+                                    <button class="btn btn-success dropdown-toggle btn-sm m-2 " type="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
                                             Perfil
                                     </button>
@@ -141,6 +138,10 @@
                                         <hr>
                                         <li><a class="dropdown-item text-danger" href="{%url 'logout'%}">Cerrar Sesión</a></li>
                                     </ul>
+
+                                    <a class="navbar-brand" href="{%url 'ver_perfil' request.session.logueado.id%}">
+                                        <img src="{{ request.session.logueado.foto }}" alt="Foto de Perfil" width="40" height="40" class="d-inline-block rounded-circle">
+                                    </a>
                                 </div>
                                 
                             </div>

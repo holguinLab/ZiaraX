@@ -21,7 +21,6 @@ class Usuarios(models.Model):
     def __str__(self):
         return f' {self.nombre_completo} - {self.email}'
 
-
 class Administradores(models.Model):
     usuario_admin = models.ForeignKey('Usuarios',on_delete=models.CASCADE,related_name="administradores") 
 
@@ -43,7 +42,7 @@ class Clientes(models.Model):
 
 class Servicios(models.Model):
     nombre = models.CharField(max_length=100)
-    precio = models.FloatField()
+    precio = models.DecimalField(max_digits=12,decimal_places=3)
     duracion = models.CharField(max_length=100)
     CATEGORIAS = (
         ("B","Barba"),
@@ -57,7 +56,6 @@ class Servicios(models.Model):
 class Citas(models.Model):
     cliente = models.ForeignKey('Clientes',on_delete=models.CASCADE,related_name="cita_cliente") 
     barbero = models.ForeignKey('Barberos',on_delete=models.SET_NULL,null=True,related_name="cita_barbero") 
-    servicio = models.ForeignKey('Servicios',on_delete=models.CASCADE,related_name="cita_servicio")
     fecha = models.DateField(default=now ,null=True,blank=True)
     ESTADOS =(
         ("PEN","Pendiente"),
@@ -65,7 +63,14 @@ class Citas(models.Model):
         ("CAN","Cancelada"),
         ("FIN","Finalizada"),
     )
-    estado = models.CharField(max_length=4,choices=ESTADOS)
+    estado = models.CharField(max_length=3,choices=ESTADOS)
     
     def __str__(self):
-        return f' {self.cliente} - {self.barbero} - {self.servicio}'
+        return f' {self.cliente} - {self.barbero} '
+
+# Un cliente puede tener muchos servicios
+class CitaServicios(models.Model):
+    cita = models.ForeignKey('Citas',on_delete=models.CASCADE,related_name="citas")
+    servicio = models.ForeignKey('Servicios', on_delete=models.SET_NULL, null=True, blank=True, related_name="cita_servicio")
+
+

@@ -19,8 +19,14 @@ class adminServicios(admin.ModelAdmin):
 
 @admin.register(Citas)
 class adminCitas(admin.ModelAdmin):
-    list_display=['id','cliente','barbero','servicio','estado','fecha']
-    list_editable=['cliente','barbero','servicio','estado']
+    list_display=['id','cliente','barbero','estado','fecha']
+    list_editable=['cliente','barbero','estado']
+
+
+@admin.register(CitaServicios)
+class adminCitaServicios(admin.ModelAdmin):
+    list_display=['id','cita','servicio']
+    list_editable=['cita']
     
 @admin.register(Clientes)
 class adminClientes(admin.ModelAdmin):

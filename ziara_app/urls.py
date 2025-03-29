@@ -32,7 +32,8 @@ urlpatterns=[
     #RESERVAS 
     path('reservas_citas/',reservas_citas,name='reservas_citas'),
     path('registrar_citas/',registrar_citas,name='registrar_citas'),
-    
+    path('agregar_servicio_carrito/<int:servicio_id>/',agregar_servicio_carrito,name='agregar_servicio_carrito'),
+    path('eliminar_elementos_carrito/<int:servicio_id>/',eliminar_elementos_carrito,name='eliminar_elementos_carrito'),
     
     # region PANEL DE USUARIO
     path('logout/',logout,name='logout'),

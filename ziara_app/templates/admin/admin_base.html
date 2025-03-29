@@ -181,13 +181,7 @@
                     li.className = 'dropdown-item text-muted'
                     li.textContent = notificacion
                     lista.appendChild(li)
-
-                    setTimeout(() => {
-                        li.remove(); // Borra el elemento de la lista
-                    }, 10000);
                 });
-
-
 
                 if (data.notificaciones.length  > 0 ){
                     contador.style.display = "inline";  // Muestra el contador si hay notificaciones
