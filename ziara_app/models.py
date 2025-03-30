@@ -44,6 +44,7 @@ class Servicios(models.Model):
     nombre = models.CharField(max_length=100)
     precio = models.DecimalField(max_digits=12,decimal_places=3)
     duracion = models.CharField(max_length=100)
+    descripcion = models.CharField(max_length=200,blank=True,null=True,default='')
     CATEGORIAS = (
         ("B","Barba"),
         ("C","Cabello"),

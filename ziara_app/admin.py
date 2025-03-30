@@ -14,8 +14,8 @@ class adminBarberos(admin.ModelAdmin):
 
 @admin.register(Servicios)
 class adminServicios(admin.ModelAdmin):
-    list_display=['id','nombre','precio','duracion']
-    list_editable=['nombre','precio','duracion']
+    list_display=['id','nombre','precio','duracion','descripcion']
+    list_editable=['nombre','precio','duracion','descripcion']
 
 @admin.register(Citas)
 class adminCitas(admin.ModelAdmin):

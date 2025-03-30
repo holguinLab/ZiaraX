@@ -25,8 +25,8 @@
                 
                 <td class="text-center">  {# Centra todo el contenido dentro del td #}
                     <ul class="p-0 m-0 text-center" style="list-style: none;">
-                        {% for servicio in cita.citas.all %}
-                            <li>{{ servicio.servicio.nombre }}</li>
+                        {% for servicio in cita.citas.all %} <!-- la primera 'cita' es el iterador que esta dentro del for , la segunda 'citas', es el related_name de esa clase en el archivo models , en la parte de citaservicios en el atribito cita -->
+                            <li>{{ servicio.servicio.nombre }} </li>
                         {% endfor %}
                     </ul>
                 </td>

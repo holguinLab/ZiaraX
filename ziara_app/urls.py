@@ -8,8 +8,6 @@ urlpatterns=[
     path('login/',login,name='login'),
     path('register/',register,name='register'),
     
-    
-    
     #region PANEL ADMIN 
     path('admin_panel/',admin_panel,name='admin_panel'),
     
@@ -28,12 +26,20 @@ urlpatterns=[
     path('ultimos_datos_admin/',ultimos_datos_admin,name='ultimos_datos_admin'),
     #endregion
 
-
-    #RESERVAS 
+    #region CLIENTES
+    
+    # region Citas
     path('reservas_citas/',reservas_citas,name='reservas_citas'),
     path('registrar_citas/',registrar_citas,name='registrar_citas'),
     path('agregar_servicio_carrito/<int:servicio_id>/',agregar_servicio_carrito,name='agregar_servicio_carrito'),
     path('eliminar_elementos_carrito/<int:servicio_id>/',eliminar_elementos_carrito,name='eliminar_elementos_carrito'),
+    path('ver_citas/',ver_citas,name='ver_citas'),
+    path('confirmar_citas/<int:id_cita>/',confirmar_citas,name='confirmar_citas'),
+    path('cancelar_citas/<int:id_cita>/',cancelar_citas,name='cancelar_citas'),
+    #endregion
+    
+    
+    #endregion
     
     # region PANEL DE USUARIO
     path('logout/',logout,name='logout'),

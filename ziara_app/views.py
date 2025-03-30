@@ -35,6 +35,7 @@ def index(request):
 
 #region CLIENTES
 
+#region Citas
 #MUESTRA EL HTML CON EL CALENDARIO , BARBEROS Y SERVICIOS
 def reservas_citas (request):
     verificar = request.session.get('logueado',{})
@@ -124,13 +125,11 @@ def registrar_citas(request):
     verificar_carrito = request.session.get('carrito_servicios',False)
     if request.method == 'POST' :
         if verificar and verificar['rol'] == 'C':
-            usuario = Usuarios.objects.get(pk = verificar['id'])
-            cliente = Clientes.objects.get(usuario_cliente = usuario)
-            
             barbero_id = request.POST.get('barbero')  # Recibir el ID del barbero
-            barbero = Barberos.objects.get(pk=barbero_id)
-            
             try:
+                usuario = Usuarios.objects.get(pk = verificar['id'])
+                cliente = Clientes.objects.get(usuario_cliente = usuario)
+                barbero = Barberos.objects.get(pk=barbero_id)
                 cita = Citas(
                     barbero=barbero,
                     cliente=cliente,
@@ -156,20 +155,73 @@ def registrar_citas(request):
                     return redirect('index')
                 return redirect('index')
             except Citas.DoesNotExist:
-                messages.warning(request,'❌ ERROR :No hay Datos Asociados')
+                messages.warning(request,'❌ ERROR :No hay Datos Sobre Citas Asociadas')
             except Usuarios.DoesNotExist:
-                messages.warning(request,'❌ ERROR :No hay Datos Asociados')
+                messages.warning(request,'❌ ERROR :No hay Datos Sobre Usuarios  Asociados')
             except Barberos.DoesNotExist:
-                messages.warning(request,'❌ ERROR :No hay Datos Asociados')
+                messages.warning(request,'❌ ERROR :No hay Datos Sobre Barberos Asociados')
             except Servicios.DoesNotExist:
-                messages.warning(request,'❌ ERROR :No hay Datos Asociados')
+                messages.warning(request,'❌ ERROR :No hay Datos Sobre Servicios Asociados')
             except Exception as e:
                 messages.warning(request,f'❌ ERROR :{e}')
-            return redirect('index')
+            return redirect('reservas_citas')
         else:
             messages.info(request,'❌ ERROR : No Tienes Permitido Hacer Esto')
             return redirect('login')
     return redirect('index')
+
+def ver_citas(request):
+    verificar =request.session.get('logueado',[])
+    if verificar['rol'] == 'C':
+        try:
+            usuario = Usuarios.objects.get(pk = verificar['id'])
+            cliente = usuario.clientes.first()
+            contexto={
+                'cliente' : cliente
+            }
+            return render(request,'clientes/ver_citas.html',contexto)
+        except Usuarios.DoesNotExist:
+            messages.info(request,' ❌ ERROR : No Hay Datos Sobre Usuarios Asociados')
+        except Exception as e:
+            messages.info(request,f' ❌ ERROR : {e}')
+        return redirect('index')
+    else:
+        messages.warning(request,'❌ ERROR: No Tienes Permito Hacer Esto')
+        return redirect('index')
+
+def confirmar_citas(request,id_cita):
+    verificar = request.session.get('logueado',[])
+    if verificar['rol'] == 'C':
+        try:
+            cita = Citas.objects.get(pk = id_cita)
+            cita.estado = 'PRO'
+            cita.save()
+            return redirect('ver_citas')
+        except Citas.DoesNotExist:
+            messages.info(request,' ❌ ERROR : No Hay Datos Sobre Citas Asociados')
+        except Exception as e:
+            messages.info(request,f' ❌ ERROR : {e}')
+        return redirect('index')
+    else:
+        messages.warning(request,'❌ ERROR: No Tienes Permito Hacer Esto')
+        return redirect('index')
+
+def cancelar_citas(request,id_cita):
+    verificar = request.session.get('logueado',[])
+    if verificar['rol'] == 'C':
+        try:
+            cita = Citas.objects.get(pk = id_cita)
+            cita.delete()
+            return redirect('ver_citas')
+        except Citas.DoesNotExist:
+            messages.info(request,' ❌ ERROR : No Hay Datos Sobre Citas Asociados')
+        except Exception as e:
+            messages.info(request,f' ❌ ERROR : {e}')
+        return redirect('index')
+    else:
+        messages.warning(request,'❌ ERROR: No Tienes Permito Hacer Esto')
+        return redirect('index')
+
 #endregion
 
 #region PROCESO DE IMAGENES
@@ -246,6 +298,7 @@ def listar_servicios(request):
             servicio.nombre = request.POST.get('nombre')
             servicio.precio = request.POST.get('precio')
             servicio.duracion = request.POST.get('duracion')
+            servicio.descripcion = request.POST.get('descripcion')
             servicio.categoria = request.POST.get('categoria')
             servicio.save()
             messages.success(request,'✅ Servicio Actualizado Correctamente')
@@ -278,7 +331,8 @@ def nuevo_servicio(request):
             nuevo = Servicios(
                 nombre = request.POST.get('nombre'),
                 precio = request.POST.get('precio'),
-                duracion = request.POST.get('duracion')
+                duracion = request.POST.get('duracion'),
+                descripcion = request.POST.get('descripcion')
             )
             nuevo.save()
             messages.success(request,' ✅ Servicio Agregado Con Exito')

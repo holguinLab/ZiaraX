@@ -40,6 +40,7 @@
                 <th class="text-center">Nombre</th>
                 <th class="text-center" >Precio</th>
                 <th class="text-center" >Duracion</th>
+                <th class="text-center" >Descripcion</th>
                 <th class="text-center" >Categoria</th>
                 <th class="text-center" >Acciones</th>
             </tr>
@@ -67,6 +68,12 @@
                         <p style="display: none;">{{servicio.duracion}}</p>
                         <input type="text" name="duracion" value="{{servicio.duracion}}" class="form-control">
                     </td>
+
+                    <td>
+                        <p style="display: none;">{{servicio.descripcion}}</p>
+                            <input type="text" name="descripcion" value="{{servicio.descripcion}}" class="form-control">
+                    </td>
+
                     <td class="">
                         <p style="display: none;">{{servicio.get_categoria_display}}</p>
                         <select class="form-select "  name="categoria" id="categoria" >

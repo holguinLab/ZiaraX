@@ -54,18 +54,21 @@
             <!-- Menú colapsable -->
             <div class="collapse navbar-collapse pt-0" id="navbarTogglerDemo01">
                 <ul class="navbar-nav ms-auto  mb-lg-0 gap-2 ">
-                    <li class="nav-item">
-                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">En proceso</a>
-                    </li>
-                    <li class="nav-item">
-                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">En proceso</a>
-                    </li>
-                    <li class="nav-item">
-                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">En proceso</a>
-                    </li>
-                    <li class="nav-item">
-                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">En proceso</a>
-                    </li>
+                    {%if request.session.logueado.rol == 'C' %}
+                        <li class="nav-item">
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">En proceso</a>
+                        </li>
+                        <li class="nav-item">
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">En proceso</a>
+                        </li>
+                        <li class="nav-item">
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">En proceso</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'ver_citas'%} ">Mis Citas</a>
+                        </li>
+                    {%endif%}
                 </ul>
 
                 <ul class="navbar-nav ms-auto me-2 mb-lg-0 gap-2 ">
