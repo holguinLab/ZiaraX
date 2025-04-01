@@ -41,10 +41,11 @@ class Clientes(models.Model):
         return f' {self.usuario_cliente} '
 
 class Servicios(models.Model):
-    nombre = models.CharField(max_length=100)
-    precio = models.DecimalField(max_digits=12,decimal_places=3)
-    duracion = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=100,null=False,blank=False)
+    precio = models.DecimalField(max_digits=12,decimal_places=3,null=False,blank=False)
+    duracion = models.CharField(max_length=100,blank=True,null=True ,default='')
     descripcion = models.CharField(max_length=200,blank=True,null=True,default='')
+    img_url = models.URLField(blank=True, null=True)  # Guarda la URL completa de la imagen
     CATEGORIAS = (
         ("B","Barba"),
         ("C","Cabello"),
@@ -70,9 +71,10 @@ class Citas(models.Model):
         return f' {self.cliente} - {self.barbero} '
 
 class Productos(models.Model):
-    nombre = models.CharField(max_length=100)
-    precio = models.DecimalField(max_digits=12,decimal_places=3)
+    nombre = models.CharField(max_length=100,null=False,blank=False)
+    precio = models.DecimalField(max_digits=12,decimal_places=3,null=False,blank=False)
     descripcion = models.TextField(blank=True,null=True,default='')
+    img_url = models.URLField(blank=True, null=True)  # Guarda la URL completa de la imagen
     CATEGORIAS = (
         ("B","Barba"),
         ("C","Cabello"),

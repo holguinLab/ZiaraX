@@ -36,7 +36,7 @@ def index(request):
 
 # vista que convierte la consulta de servicios en json para que la podamos usar en el script(js) de index_servicios.js
 def obtener_servicios(request):
-    servicios = Servicios.objects.all().values('id')
+    servicios = Servicios.objects.all().values('id','img_url')
     return JsonResponse(list(servicios), safe=False) 
 
 #region CLIENTES
@@ -307,6 +307,7 @@ def listar_servicios(request):
             servicio.duracion = request.POST.get('duracion')
             servicio.descripcion = request.POST.get('descripcion')
             servicio.categoria = request.POST.get('categoria')
+            servicio.img_url = request.POST.get('img_url') # El ID QUE TIENEN LAS IMAGENES DE PIXABY
             servicio.save()
             messages.success(request,'✅ Servicio Actualizado Correctamente')
             return redirect('listar_servicios')
@@ -337,8 +338,6 @@ def nuevo_servicio(request):
             nuevo = Servicios(
                 nombre = request.POST.get('nombre'),
                 precio = request.POST.get('precio'),
-                duracion = request.POST.get('duracion'),
-                descripcion = request.POST.get('descripcion')
             )
             nuevo.save()
             messages.success(request,' ✅ Servicio Agregado Con Exito')
@@ -434,6 +433,7 @@ def listar_productos(request):
             producto.precio = request.POST.get('precio')
             producto.descripcion = request.POST.get('descripcion')
             producto.categoria = request.POST.get('categoria')
+            producto.img_url = request.POST.get('img_url') # El ID QUE TIENEN LAS IMAGENES DE PIXABY
             producto.save()
             messages.success(request,' ✅ Producto Actualizado Con Exito ')
             return redirect('listar_productos')
