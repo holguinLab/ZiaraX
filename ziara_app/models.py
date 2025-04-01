@@ -69,9 +69,25 @@ class Citas(models.Model):
     def __str__(self):
         return f' {self.cliente} - {self.barbero} '
 
+class Productos(models.Model):
+    nombre = models.CharField(max_length=100)
+    precio = models.DecimalField(max_digits=12,decimal_places=3)
+    descripcion = models.TextField(blank=True,null=True,default='')
+    CATEGORIAS = (
+        ("B","Barba"),
+        ("C","Cabello"),
+        ("R","Rostro"),
+    )
+    categoria = models.CharField(max_length=1,choices=CATEGORIAS,default='')
+    def __str__(self):
+        return f' {self.nombre} '    
+
+class Inventarios(models.Model):
+    producto = models.ForeignKey('Productos',on_delete=models.CASCADE,related_name='inventario_productos')
+    stock = models.IntegerField()
+    fecha_actualizacion = models.DateTimeField(auto_now=True)    
+
 # Un cliente puede tener muchos servicios
 class CitaServicios(models.Model):
     cita = models.ForeignKey('Citas',on_delete=models.CASCADE,related_name="citas")
     servicio = models.ForeignKey('Servicios', on_delete=models.SET_NULL, null=True, blank=True, related_name="cita_servicio")
-
-

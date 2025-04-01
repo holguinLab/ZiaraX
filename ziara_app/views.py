@@ -27,16 +27,22 @@ from django.core.mail import send_mail
 def index(request):
     carrito_id = request.session.get('carrito_servicios',[])
     carrito_servicios = Servicios.objects.filter(id__in = carrito_id) # Filter devuelve una lista 
+    servicios = Servicios.objects.all()
     contexto = {
-        'carrito_servicios' :carrito_servicios
+        'carrito_servicios' :carrito_servicios,
+        'servicios':servicios
     }
     return render(request,'index.html',contexto)
 
+# vista que convierte la consulta de servicios en json para que la podamos usar en el script(js) de index_servicios.js
+def obtener_servicios(request):
+    servicios = Servicios.objects.all().values('id')
+    return JsonResponse(list(servicios), safe=False) 
 
 #region CLIENTES
 
 #region Citas
-#MUESTRA EL HTML CON EL CALENDARIO , BARBEROS Y SERVICIOS
+
 def reservas_citas (request):
     verificar = request.session.get('logueado',{})
     carrito_id = request.session.get('carrito_servicios',[])
@@ -119,7 +125,6 @@ def eliminar_elementos_carrito(request,servicio_id):
         messages.error(request,f'❌ ERROR : {e}')
     return redirect('index')
 
-#REISTRA LAS CITAS CON LA SELECCION ANTERIOR
 def registrar_citas(request):
     verificar = request.session.get('logueado',False)
     verificar_carrito = request.session.get('carrito_servicios',False)
@@ -223,6 +228,7 @@ def cancelar_citas(request,id_cita):
         return redirect('index')
 
 #endregion
+#endregion
 
 #region PROCESO DE IMAGENES
 def hacer_imagen_redonda(imagen, tamaño=(150, 150)):
@@ -262,7 +268,7 @@ def admin_panel(request):
         return redirect('index')
     return render(request,'admin/inicio.html')
 
-#USUARIOS
+#region USUARIOS
 def listar_usuarios(request):
     verificar = request.session.get('logueado',False)
     if not  verificar   :
@@ -281,8 +287,9 @@ def listar_usuarios(request):
             'barberos' :barberos
         }
         return render(request,'admin/usuarios/listar_usuarios.html',contexto)
+#endregion
 
-#SERVICIOS
+#region SERVICIOS
 def listar_servicios(request):
     verificar = request.session.get('logueado',False)
     if not verificar :
@@ -317,7 +324,6 @@ def listar_servicios(request):
         }
         return render(request,'admin/servicios/listar_servicios.html',contexto)
 
-#AÑADIR SERVICIO
 def nuevo_servicio(request):
     verificar = request.session.get('logueado',False)
     if not verificar :
@@ -343,7 +349,11 @@ def nuevo_servicio(request):
     else:
         return redirect('listar_servicios')
 
-#BARBEROS
+def eliminar_servicio(request):
+    pass
+#endregion
+
+#region BARBEROS
 def detalles_barberos(request,id_barbero):
     verificar = request.session.get('logueado',False)
     if verificar == False :
@@ -363,8 +373,9 @@ def detalles_barberos(request,id_barbero):
             messages.error(request,f'ERROR : {e}')
             return redirect('listar_usuarios')
 
+#endregion
 
-#CITAS
+#region CITAS
 def listar_citas(request):
     verificar = request.session.get('logueado',False)
     if not verificar :
@@ -378,7 +389,95 @@ def listar_citas(request):
         'citas' : q,
     }
     return render(request,'admin/citas/listar_citas.html',contexto)
+#endregion
 
+#region INVENTARIO
+def inventario(request):
+    verificar = request.session.get('logueado',[])
+    if  verificar['rol'] != 'A'  :
+        messages.warning(request,'❌ ERROR: No Tienes Permitido Hacer Esto ')
+        return redirect('index')
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        try:
+            producto = Inventarios.objects.get(pk = id)
+            producto.stock = request.POST.get('stock')
+            producto.save()
+            messages.success(request,' ✅ Producto Actualizado Con Exito ')
+            return redirect('inventario')
+        except Inventarios.DoesNotExist:
+            messages.success(request,'❌ ERROR : No Hay Datos Sobre Productos Asociados ')
+        except Exception as e:
+            messages.success(request,f'❌ ERROR :{e}')
+        return redirect('inventario')
+    inventario = Inventarios.objects.all()
+    contexto={
+        'inventario' : inventario
+    }
+    return render(request,'admin/inventario.html',contexto)
+
+#endregion
+
+#region PRODUCTOS
+
+def listar_productos(request):
+    verificar = request.session.get('logueado',[])
+    if  verificar['rol'] != 'A'  :
+        messages.warning(request,'❌ ERROR: No Tienes Permitido Hacer Esto ')
+        return redirect('index')
+    
+    if request.method == 'POST' :
+        try:
+            id = request.POST.get('id')
+            producto = Productos.objects.get(pk = id)
+            producto.nombre = request.POST.get('nombre')
+            producto.precio = request.POST.get('precio')
+            producto.descripcion = request.POST.get('descripcion')
+            producto.categoria = request.POST.get('categoria')
+            producto.save()
+            messages.success(request,' ✅ Producto Actualizado Con Exito ')
+            return redirect('listar_productos')
+        except Productos.DoesNotExist:
+            messages.success(request,'❌ ERROR : No Hay Datos Sobre Productos Asociados ')
+        except Exception as e:
+            messages.success(request,f'❌ ERROR :{e}')
+        return redirect('listar_productos')
+    productos = Productos.objects.all()
+    categorias = Productos.CATEGORIAS
+    contexto = {
+        'productos' : productos,
+        'categorias' :categorias
+    }
+    return render(request,'admin/productos/listar_productos.html',contexto)
+
+def nuevo_producto(request):
+    verificar = request.session.get('logueado',False)
+    if not verificar :
+        messages.info(request,'Debes Iniciar Sesion Primero')
+        return redirect('index')
+    elif not verificar['rol'] == 'A' :
+        messages.warning(request,'No Tienes Permisos Necesarios Para Hacer Esto')
+        return redirect('index')
+    if request.method == 'POST':
+        try:
+            producto = Productos(
+                nombre = request.POST.get('nombre'),
+                precio = request.POST.get('precio'),
+            )
+            producto.save()
+            add_inventario = Inventarios(
+                producto = producto,
+                stock = 0
+            )
+            add_inventario.save()
+            messages.success(request,' ✅ Producto Agregado Con Exito')
+            return redirect('listar_productos')
+        except Exception as e:
+            messages.error(request,f' ❌ ERROR : {e}')
+            return redirect('listar_productos')
+    else:
+        return redirect('listar_productos')
+#endregion
 
 #endregion
 
@@ -813,9 +912,15 @@ def ultimos_datos_admin(request):
     elif verificar['rol'] != 'A':
         messages.info(request,'❌ERROR : No tienes los permisos necesarios')
         return redirect('index')
-    usuarios = Usuarios.objects.order_by('-id')[:2]
+    usuarios = Usuarios.objects.order_by('-id')[:1]
+    servicios = Servicios.objects.order_by('-id')[:1]
+    citas = Citas.objects.order_by('-id')[:1]
     for usuario in usuarios:
         notificaciones.append(f'{usuario.nombre_completo} Se ha registrado')
+    for servicio in servicios:
+        notificaciones.append(f'El servicio {servicio.nombre} fue añadio  ')
+    for cita in citas:
+        notificaciones.append(f'{cita.cliente.usuario_cliente.nombre_completo} agendo una cita  ')
     return JsonResponse({'notificaciones':notificaciones})
 
 

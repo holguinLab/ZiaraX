@@ -1,0 +1,124 @@
+{%extends 'admin/admin_base.html'%}
+{%load static%}
+{%block titulo%}Productos{%endblock%}
+{%block dataTables%}<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">{%endblock%}
+
+
+{%block main%}
+<div class="table-responsive  w-100 p-5">
+    <div class="d-flex">
+        <button type="button" class="btn text-success fw-bold mb-3 btn-transparent   dropdown-toggle"data-bs-toggle="dropdown" aria-expanded="false"data-bs-auto-close="outside">
+            <i class="bi bi-person-plus-fill"></i> Añadir
+        </button>
+        <form method="post" action="{%url 'nuevo_producto'%}" enctype="multipart/form-data"
+            class="dropdown-menu  p-4 row" style="min-width: 300px;">
+            {%csrf_token%}
+            <label for="nombre" class="form-label">Nombre</label>
+            <div class="input-group mb-3 col-12">
+                <input type="text" name="nombre" class="form-control" id="nombre"
+                    placeholder="Crema para peinar" required>
+            </div>
+            <div class="mb-3 col-12">
+                <label for="precio" class="form-label">Precio</label>
+                <input type="number" name="precio" class="form-control" id="precio"
+                    placeholder="100.000" required>
+            </div>
+
+            <button type="submit" class="btn btn-outline-success   w-100 ">Guardar</button>
+        </form>
+    </div>
+
+    <table id="miTabla" class="  pt-3 table  table-hover  w-100">
+        <thead >
+            <tr >
+                <th class="text-center" style="display: none;">ID</th>
+                <th class="text-center">Nombre</th>
+                <th class="text-center" >Precio</th>
+                <th class="text-center" >Descripcion</th>
+                <th class="text-center" >Categoria</th>
+                <th class="text-center" >Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for producto in productos%}
+            <tr>
+                <form  action="" method="post">
+                    {%csrf_token%}
+                    
+                    <td style="display:  none;">
+                        
+                        <input type="text" name="id" value="{{producto.id}}" class="form-control">
+                    </td>
+
+                    <td>
+                        <p style="display: none;">{{producto.nombre}}</p>
+                        <input type="text" name="nombre" value="{{producto.nombre}}" class="form-control">
+                    </td>
+                    
+                    <td class="col-2">
+                        <p style="display: none;">{{producto.precio}}</p>
+                        <input type="text" name="precio" value="{{producto.precio}}" class="form-control">
+                    </td>
+                    <td>
+                        <p style="display: none;">{{producto.descripcion}}</p>
+                            <input type="text" name="descripcion" value="{{producto.descripcion}}" class="form-control">
+                    </td>
+
+                    <td class="">
+                        <p style="display: none;">{{producto.get_categoria_display}}</p>
+                        <select class="form-select "  name="categoria" id="categoria" >
+                            <option value="{{producto.categoria}}">{{producto.get_categoria_display}}</option >
+                            {%for categoria , etiqueta in categorias%}
+                            <option value="{{categoria}}">{{etiqueta}}</option >
+                            {%endfor%}
+                        </select>
+                    </td>
+                    <td class="text-center ">
+
+                        
+                        {%for inventario in producto.inventario_productos.all%}
+                        <a class="text-danger fw-bold fs-5" href=""><i class="bi bi-eye"></i></a>
+                        {%endfor%}
+
+                        
+                        <button type="submit" class="text-center text-success fs-5 " style="border: none; background-color: transparent;" ><i class="bi bi-floppy-fill"></i></button>
+                        
+
+                        <a class="text-danger fw-bold fs-5" href=""><i class="bi bi-trash3-fill"></i></a>
+                        
+                    </td>
+                </form>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+</div>
+{%endblock%}
+
+
+
+{%block configTables%}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#miTabla').DataTable({
+            paging: true, // Paginación
+            searching: true, // Búsqueda
+            ordering: true, // Ordenamiento
+            pageLength: 5, // Número de filas por página
+            language: {
+                search: "Buscar:", // Personaliza el texto de búsqueda
+                lengthMenu: "Mostrar _MENU_ registros",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                paginate: {
+                    first: "Primero",
+                    last: "Último",
+                    next: "Siguiente",
+                    previous: "Anterior"
+                }
+            }
+        });
+    });
+</script>
+{%endblock%}
