@@ -1,0 +1,130 @@
+{%extends 'index.html'%}
+{%load static%}
+{%block titulo %}Tienda{%endblock%}
+
+
+
+{%block main%}
+<div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+
+    <!-- Indicadores del carrusel -->
+    <div class="carousel-indicators">
+        {% for producto in ultimos_productos %}
+        <button type="button" data-bs-target="#carouselExampleCaptions" 
+            data-bs-slide-to="{{ forloop.counter0 }}" 
+            class="{% if forloop.first %}active{% endif %}" 
+            aria-label="Slide {{ forloop.counter }}">
+        </button>
+        {% endfor %}
+    </div>
+
+    <!-- Contenedor de los elementos del carrusel -->
+    <div class="carousel-inner">
+        {% for producto in ultimos_productos %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+
+            <!-- Título dentro del carrusel -->
+            <div class="position-absolute top-0 start-50 translate-middle-x bg-success bg-opacity-75 text-white py-2 px-4 rounded-bottom shadow-lg">
+                <h2 class="fw-bold text-uppercase m-0">Últimos Productos Agregados</h2>
+            </div>
+
+            <!-- Imagen del producto -->
+            <div class="d-flex justify-content-center align-items-center bg-dark" 
+                style="height: 100vh; overflow: hidden;">
+                <img id="img_{{ producto.id }}" class="img-fluid w-100 h-100" 
+                    src="{{ producto.imagen.url }}" 
+                    alt="Foto {{ producto.nombre }}" 
+                    style="object-fit: cover;">
+            </div>
+
+            <!-- Descripción del producto -->
+            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded p-2">
+                <h5 class="text-white">{{ producto.nombre }}</h5>
+                <p class="text-light">{{ producto.descripcion }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Controles del carrusel -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+
+</div>
+
+
+<div class="container mt-4">
+    <!-- Buscador + Botón de Música -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8">
+            <div class="input-group shadow-sm">
+                <input type="text" class="form-control border-success" placeholder="🔍 Busca tu producto favorito...">
+                <button class="btn btn-success">Buscar</button>
+                
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col text-center">
+            <button class="btn btn-outline-success shadow-sm fw-bold px-3 m-1">🌿 Todos</button>
+            <button class="btn btn-outline-success shadow-sm fw-bold px-3 m-1">💆‍♂️ Cabello</button>
+            <button class="btn btn-outline-success shadow-sm fw-bold px-3 m-1">🧴 Rostro</button>
+            <button class="btn btn-outline-success shadow-sm fw-bold px-3 m-1">🛀 Cuerpo</button>
+            <button class="btn btn-outline-success shadow-sm fw-bold px-3 m-1">🌿 Natural</button>
+        </div>
+    </div>
+
+    <!-- Lista de Productos -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <!-- Producto -->
+        {% for producto in productos %}
+        <div class="col">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="position-relative">
+                    <img id="img_{{ producto.id }}" class="card-img-top rounded-top-4" alt="Producto {{ producto.nombre }}">
+                    <span class="badge bg-success position-absolute top-0 start-0 m-2">Nuevo</span>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success fw-bold"> {{producto.nombre}} </h5>
+                    <p class="text-muted">Categoría: <span class="fw-semibold">{{producto.get_categoria_display}}</span></p>
+                    <p class="fw-bold text-success fs-5">{{producto.precio}} $</p>
+                    <p class="text-muted limited-text"> {{producto.descripcion}} </p>
+                    {%if request.session.logueado.rol == 'C' %}
+                    <a href="{%url 'agregar_productos_carrito' producto.id %}" class="btn btn-success w-100 fw-bold shadow-sm">🛒 Agregar al Carrito</a>
+                    
+                    {%else%}
+                        <p class="text-danger fw-bold text-center">🔑 Regístrate o inicia sesión para comprar</p>
+                    {%endif%}
+                </div>
+            </div>
+        </div>
+        {%endfor%}
+    </div>
+    
+    <style>
+        .limited-text {
+            max-height: calc(1.5em * 2);  /* Ajusta según el line-height y número de líneas */
+        overflow: hidden;
+        display: block;
+        text-overflow: ellipsis;
+        white-space: normal;
+        line-height: 1.5em;  /* Define la altura de línea para controlar el corte */
+    } 
+    </style>
+
+</div>
+
+{%endblock%}
+
+{%block js%}
+<script src="{%static 'js/index_productos.js'%}"></script>
+{%endblock%}

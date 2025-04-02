@@ -1,4 +1,4 @@
-{%extends 'base.html'%}
+{%extends 'index.html'%}
 {%load static%}
 {%block titulo %}Resevar{%endblock%}
 {%block estilos%}
@@ -17,28 +17,7 @@
 {%endblock%}
 
 
-{%block carrito%}
-<button class="btn btn-transparent btn-sm dropdown-toggle" type="button" id="dropdownCarrito" data-bs-toggle="dropdown" aria-expanded="false" style="border: none;">
-    {% if carrito_servicios|length > 0 %}
-    <i class="bi bi-cart3"></i>  <span class="badge bg-danger" id="contadorCarrito">  {{carrito_servicios|length}}   </span>
-    {%endif%}
-</button>
 
-<ul class="dropdown-menu dropdown-menu-end w-100 pb-0" aria-labelledby="dropdownCarrito" id="listaCarrito">
-    {% if carrito_servicios|length > 0 %}
-    {%for servicio in carrito_servicios%}
-        <li class="dropdown-item  d-flex justify-content-between align-items-center">
-            <span class="text-wrap"> {{servicio.nombre}} </span>
-            <a href="{% url 'eliminar_elementos_carrito' servicio.id %}" class="btn btn-outline-danger btn-sm">
-                <i class="fas fa-trash-alt"></i> Eliminar
-            </a>
-        </li>
-    {%endfor%}
-    {%else%}
-        <li><span class="dropdown-item-text text-muted">Carrito vacío</span></li>
-    {%endif%}
-</ul>
-{%endblock%}
 {%block main%}
 <form class="" action="{% url 'registrar_citas' %} " method="post">
     <input id="fechaSeleccionada" type="date" name="fecha" style="display: none;">

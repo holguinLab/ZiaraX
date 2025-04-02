@@ -1,0 +1,45 @@
+{%extends 'admin/admin_base.html'%}
+{%load static%}
+{%block titulo%}Detalle Producto{%endblock%}
+{%block main%}
+<div class="container mt-5">
+    <div class="card border-success shadow-lg rounded-4 p-4">
+        <div class="card-header bg-success text-white fw-bold text-center fs-3 py-3">
+            📦 Gestión de Inventario
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {%csrf_token%}
+                <div class="row g-4 align-items-center">
+                    <!-- Imagen del producto -->
+                    <div class="col-lg-5 text-center">
+                        <img id="img_{{producto.producto.id}}" class="img-fluid rounded-4 shadow-sm w-75" alt="Imagen del {{producto.producto.nombre}}">
+                    </div>
+
+                    <!-- Información del producto -->
+                    <div class="col-lg-7">
+                        <h3 class="fw-bold text-success">{{producto.producto.nombre}}</h3>
+                        <p class="fs-5 text-muted mb-1">Categoría: <span class="fw-semibold">{{producto.producto.get_categoria_display}}</span></p>
+                        <p class="fs-5 fw-bold">Última Actualización: <span class="text-muted">{{producto.fecha_actualizacion}}</span></p>
+                        <p class="fs-5 fw-bold">Descripción: <span class="text-muted"> {{producto.producto.descripcion}} </span></p>
+
+                        <!-- Modificación de stock -->
+                        <div class="d-flex align-items-center gap-2">
+                            <div class=""> <label class="fw-bold fs-5">Stock Disponible : </label></div>
+                            <input type="number" name="stock" class="form-control form-control-lg w-25" value="{{producto.stock}}" min="0">
+                        </div>
+                        <!-- Botón Guardar -->
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" class="btn btn-lg btn-success px-4">
+                                <i class="bi bi-floppy-fill"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{%endblock%}
+{%block js%}<script src="{%static 'js/index_productos.js'%}"></script>{%endblock%}
+

@@ -25,19 +25,30 @@ from django.core.mail import send_mail
 
 # Esta funcion solo muestra el index.html cuando se llama 
 def index(request):
-    carrito_id = request.session.get('carrito_servicios',[])
-    carrito_servicios = Servicios.objects.filter(id__in = carrito_id) # Filter devuelve una lista 
     servicios = Servicios.objects.all()
+    carrito_id = request.session.get('carrito_servicios',[])
+    carrito_producto_id = request.session.get('carrito_productos',[])
+    
+    
+    carrito_servicios = Servicios.objects.filter(id__in = carrito_id) # Filter devuelve una lista 
+    carrito_productos = Productos.objects.filter(id__in = carrito_producto_id)
     contexto = {
         'carrito_servicios' :carrito_servicios,
+        'carrito_productos' :carrito_productos,
         'servicios':servicios
     }
     return render(request,'index.html',contexto)
+
+
 
 # vista que convierte la consulta de servicios en json para que la podamos usar en el script(js) de index_servicios.js
 def obtener_servicios(request):
     servicios = Servicios.objects.all().values('id','img_url')
     return JsonResponse(list(servicios), safe=False) 
+
+def obtener_productos(request):
+    productos = Productos.objects.all().values('id','img_url')
+    return JsonResponse(list(productos), safe=False) 
 
 #region CLIENTES
 
@@ -226,8 +237,65 @@ def cancelar_citas(request,id_cita):
     else:
         messages.warning(request,'❌ ERROR: No Tienes Permito Hacer Esto')
         return redirect('index')
-
 #endregion
+
+# region Productos
+def ver_tienda(request):
+    verificar = request.session.get('logueado',False)
+    if not verificar or verificar['rol'] == 'C' :
+        ultimos_productos = Productos.objects.order_by('-id')[:3]
+        productos = Productos.objects.all()
+        carrito_id = request.session.get('carrito_servicios',[])
+        carrito_producto_id = request.session.get('carrito_productos',[])
+        carrito_servicios = Servicios.objects.filter(id__in = carrito_id) # Filter devuelve una lista 
+        carrito_productos = Productos.objects.filter(id__in = carrito_producto_id)
+        contexto = {
+            'carrito_servicios' :carrito_servicios,
+            'carrito_productos' :carrito_productos,
+            'ultimos_productos':ultimos_productos,
+            'productos': productos
+        }
+        return render(request,'clientes/ver_tienda.html',contexto)
+    else:
+        messages.error(request,'❌ ERROR : No Tienes Permito Hacer Esto')
+        return redirect('index')
+
+
+def agregar_productos_carrito(request,id_producto):
+    # Si no hay session de loguedo aparece un errro y redirije a index
+    verificar = request.session.get('logueado',False)
+    if not verificar:
+        messages.warning(request,'❌ ERROR : No Tienes Permitido Hacer Esto')
+        return redirect('index')
+    #Si la session tiene como rol administrador o barbero tampoco tendra permitido agregar servicios al carrito
+    elif verificar['rol'] != 'C':
+        messages.warning(request,'❌ ERROR : No Tienes Permitido Hacer Esto')
+        return redirect('index')
+    try:
+        #Se obtiene y se compara el servicio con el id del servicio en el modelo con el id  que se ingresa en el html
+        # servicio = Servicios.objects.get(id=servicio_id) es lo mismo que usar la funcion get_objects_404
+        producto = Productos.objects.get(id = id_producto)
+        
+        #Si no hay una sesion con el nombre carrito_servicios
+        if 'carrito_productos' not in request.session:
+            request.session['carrito_servicios'] = [] #Creamos la sesion carrito_servicios que sera igual a una lista vacia
+        
+        carrito = request.session['carrito_productos'] #asigno una variable a esa sesion que creamos en este caso la llame igual
+        
+        #si el servicio_id no esta en la lista carrito se agrega , asi se evitan duplicados de servicios
+        if id_producto not in carrito:
+            carrito.append(id_producto)
+        
+        request.session["carrito_productos"] = carrito  # Guardar en sesión
+        return redirect('ver_tienda')
+    #Exepcion si el id ingresado en l html no se encuentra en el id del modelo 
+    except Productos.DoesNotExist:
+        messages.info(request,'❌ ERROR : No Hay Datos Asociados')
+    except Exception as e:
+        messages.info(request,f'❌ ERROR : {e}')
+    return redirect('index')
+#endregion
+
 #endregion
 
 #region PROCESO DE IMAGENES
@@ -348,8 +416,22 @@ def nuevo_servicio(request):
     else:
         return redirect('listar_servicios')
 
-def eliminar_servicio(request):
-    pass
+def eliminar_servicio(request,id_servicio):
+    verificar = request.session.get('logueado',[])
+    if verificar['rol'] != 'A':
+        messages.warning(request,'❌ ERROR: No Tienes Permitido Hacer Esto')
+        return redirect('index')
+    try:
+        servicio = Servicios.objects.get(pk = id_servicio)
+        servicio.delete()
+        messages.success(request,'Servicio Eliminado Correctamente')
+        return redirect('listar_servicios')
+    except Servicios.DoesNotExist:
+        messages.error(request,'Error : No Hay Datos Sobre Servicios Asociados')
+    except Exception as e:
+        messages.error(request,f'Error : {e}')
+    return redirect('listar_servicios')
+
 #endregion
 
 #region BARBEROS
@@ -477,6 +559,45 @@ def nuevo_producto(request):
             return redirect('listar_productos')
     else:
         return redirect('listar_productos')
+
+def detalle_producto(request,id_producto):
+    verificar = request.session.get('logueado',[])
+    if verificar['rol'] != 'A':
+        messages.warning(request,'❌ ERROR: No Tienes Permitido Hacer Esto')
+        return redirect('index')
+    inventario_producto = Inventarios.objects.get(pk = id_producto)
+    try:
+        if request.method =='POST':
+            inventario_producto.stock = request.POST.get('stock')
+            inventario_producto.save()
+            messages.success(request,'Stock Actualizado Con Exito')
+            return redirect('inventario')
+        contexto ={
+            "producto" : inventario_producto
+        }
+        return render(request,'admin/productos/detalle_productos.html',contexto)
+    except Inventarios.DoesNotExist:
+            messages.error(request,'Error : No Hay Datos Sobre Productos Asociados')
+    except Exception as e:
+        messages.error(request,f'Error : {e}')
+    return redirect('listar_productos')
+
+def eliminar_producto(request,id_producto):
+    verificar = request.session.get('logueado',[])
+    if verificar['rol'] != 'A':
+        messages.warning(request,'❌ ERROR: No Tienes Permitido Hacer Esto')
+        return redirect('index')
+    try:
+        producto = Productos.objects.get(pk = id_producto)
+        producto.delete()
+        messages.success(request,'Producto Eliminado Correctamente')
+        return redirect('listar_productos')
+    except Productos.DoesNotExist:
+        messages.error(request,'Error : No Hay Datos Sobre Productos Asociados')
+    except Exception as e:
+        messages.error(request,f'Error : {e}')
+    return redirect('listar_productos')
+
 #endregion
 
 #endregion

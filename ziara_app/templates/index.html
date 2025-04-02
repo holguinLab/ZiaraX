@@ -2,40 +2,63 @@
 {%load static%}
 {%block titulo %}Home{%endblock%}
 
-
 {%block carrito%}
-<button class="btn btn-transparent btn-sm dropdown-toggle" type="button" id="dropdownCarrito" data-bs-toggle="dropdown" aria-expanded="false" style="border: none;">
+
+<button class="btn btn-transparent btn-sm dropdown-toggle" type="button" id="dropdownCarrito" data-bs-toggle="dropdown"
+    aria-expanded="false" style="border: none;">
     {% if carrito_servicios|length > 0 %}
-    <i class="bi bi-cart3"></i>  <span class="badge bg-danger" id="contadorCarrito">  {{carrito_servicios|length}}   </span>
+    <i class="bi bi-cart3"></i> <span class="badge bg-danger" id="contadorCarrito"> {{carrito_servicios|length}} </span>
     {%endif%}
 </button>
 
 <ul class="dropdown-menu dropdown-menu-end w-100 pb-0" aria-labelledby="dropdownCarrito" id="listaCarrito">
     {% if carrito_servicios|length > 0 %}
+
     {%for servicio in carrito_servicios%}
-        <li class="dropdown-item  d-flex justify-content-between align-items-center">
-            <span class="text-wrap"> {{servicio.nombre}} </span>
-            <a href="{% url 'eliminar_elementos_carrito' servicio.id %}" class="btn btn-outline-danger btn-sm">
-                <i class="fas fa-trash-alt"></i> Eliminar
-            </a>
-        </li>
+    <li class="dropdown-item  d-flex justify-content-between align-items-center">
+        <span class="text-wrap"> {{servicio.nombre}} </span>
+        <a href="{% url 'eliminar_elementos_carrito' servicio.id %}" class="btn btn-outline-danger btn-sm">
+            <i class="fas fa-trash-alt"></i> Eliminar
+        </a>
+    </li>
     {%endfor%}
     {%else%}
-        <li><span class="dropdown-item-text text-muted">Carrito vacío</span></li>
+    <li><span class="dropdown-item-text text-muted">Carrito vacío</span></li>
     {%endif%}
-    
+
+
+    {% if carrito_productos|length > 0 %}
+
+    {%for producto in carrito_productos%}
+    <li class="dropdown-item  d-flex justify-content-between align-items-center">
+        <span class="text-wrap"> {{producto.nombre}} </span>
+        <a href="" class="btn btn-outline-danger btn-sm">
+            <i class="fas fa-trash-alt"></i> Eliminar
+        </a>
+    </li>
+    {%endfor%}
+    {%else%}
+    <li><span class="dropdown-item-text text-muted">Carrito vacío</span></li>
+    {%endif%}
+
 </ul>
+
+
 {%endblock%}
+
 
 {%block main %}
 {%if request.session.logueado.rol == 'C' or not request.session.logueado %}
 <div class=" container-fluid d-flex  flex-column gap-5" style="color: #F2F2F2;">
-    
+
     <div class="row d-flex p-3  align-items-center ">
         <div class="col-md-6">
-            <h1 class="display-1  fw-bold " style="color: #717171;">Eleva tu estilo con <span style="color: #66BB69;">Ziara</span></h1>
-            <p class=" fs-5 fw-semibold" style="color: #263238;">Donde la precisión se encuentra con la pasión. Más que un corte, una experiencia.</p>
-            <a href="{%url 'reservas_citas' %}"><button class="btn mt-5 shadow-lg  btn-lg fs-4  fw-semibold fs-6" style="color: #ffffff; background-color: #263238;">Reservar Cita  </button></a>
+            <h1 class="display-1  fw-bold " style="color: #717171;">Eleva tu estilo con <span
+                    style="color: #66BB69;">Ziara</span></h1>
+            <p class=" fs-5 fw-semibold" style="color: #263238;">Donde la precisión se encuentra con la pasión. Más que
+                un corte, una experiencia.</p>
+            <a href="{%url 'reservas_citas' %}"><button class="btn mt-5 shadow-lg  btn-lg fs-4  fw-semibold fs-6"
+                    style="color: #ffffff; background-color: #263238;">Reservar Cita </button></a>
         </div>
         <div class="col-md-6">
             <img src="{% static 'img/seccion1.2.svg' %}" class="img-fluid" alt="Imagen descriptiva">
@@ -47,23 +70,25 @@
 
 
         {%for servicio in servicios%}
-        <div id="card_servicios" class="card shadow-lg p-0" style="width: 18rem;">
-            <img id="img_{{servicio.id}}" class="card-img-top  " alt="Foto Servicio : {{servicio.nombre}}" >
-            <div class="card-body text-center">
-                <h5 class="card-title">{{servicio.nombre}}</h5>
-                <p class="card-text">Desde {{servicio.precio}} $ </p>
-            </div>
-        </div>
-        {%endfor%}
+        <div id=" card_servicios" class="card shadow-lg p-0" style="width: 18rem;">
+                <img id="img_{{servicio.id}}" class="card-img-top  " alt="Foto Servicio : {{servicio.nombre}}">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{servicio.nombre}}</h5>
+                    <p class="card-text">Desde {{servicio.precio}} $ </p>
+                </div>
     </div>
+    {%endfor%}
+</div>
 
 </div>
 <style>
     #card_servicios {
-    transition: transform 0.6s ease-in-out; /* Suaviza la animación */
-}
-    #card_servicios:hover{
-        transform:scale(1.2);
+        transition: transform 0.6s ease-in-out;
+        /* Suaviza la animación */
+    }
+
+    #card_servicios:hover {
+        transform: scale(1.2);
         cursor: pointer;
     }
 </style>

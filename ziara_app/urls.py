@@ -3,8 +3,10 @@ from . views import *
 
 urlpatterns=[
     path('',index,name='index'),
+
     #Esta ruta es la que retorna un json para usarlo en la api de pixaby 
     path('obtener_servicios/',obtener_servicios,name='obtener_servicios'),
+    path('obtener_productos/',obtener_productos,name='obtener_productos'),
     
     # PANEL DE SESION
     path('login/',login,name='login'),
@@ -25,7 +27,8 @@ urlpatterns=[
     #PRODUCTOS
     path('listar_productos/',listar_productos,name='listar_productos'),
     path('nuevo_producto/',nuevo_producto,name='nuevo_producto'),
-    
+    path('detalle_producto/<int:id_producto>/',detalle_producto,name='detalle_producto'),
+    path('eliminar_producto/<int:id_producto>/',eliminar_producto,name='eliminar_producto'),
     
     #CITAS 
     path('listar_citas/',listar_citas,name='listar_citas'),
@@ -51,9 +54,14 @@ urlpatterns=[
     path('ver_citas/',ver_citas,name='ver_citas'),
     path('confirmar_citas/<int:id_cita>/',confirmar_citas,name='confirmar_citas'),
     path('cancelar_citas/<int:id_cita>/',cancelar_citas,name='cancelar_citas'),
+    
     #endregion
     
-    
+    # region Productos
+    path('ver_tienda/',ver_tienda,name='ver_tienda'),
+    path('agregar_productos_carrito/<int:id_producto>/',agregar_productos_carrito,name='agregar_productos_carrito'),
+
+    #endregion
     #endregion
     
     # region PANEL DE USUARIO
