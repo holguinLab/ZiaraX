@@ -32,13 +32,14 @@ def index(request):
     
     carrito_servicios = Servicios.objects.filter(id__in = carrito_id) # Filter devuelve una lista 
     carrito_productos = Productos.objects.filter(id__in = carrito_producto_id)
+    suma = len(carrito_productos) + len(carrito_servicios)
     contexto = {
         'carrito_servicios' :carrito_servicios,
         'carrito_productos' :carrito_productos,
+        'suma' :suma,
         'servicios':servicios
     }
     return render(request,'index.html',contexto)
-
 
 
 # vista que convierte la consulta de servicios en json para que la podamos usar en el script(js) de index_servicios.js
@@ -61,13 +62,19 @@ def reservas_citas (request):
         
         barberos = Barberos.objects.all()
         servicios = Servicios.objects.all()
+        
         carrito_id = request.session.get('carrito_servicios',[])
-        carrito_servicios = Servicios.objects.filter(id__in = carrito_id) # filter devuelve una lista 
+        carrito_producto_id = request.session.get('carrito_productos',[])
+        carrito_servicios = Servicios.objects.filter(id__in = carrito_id) # Filter devuelve una lista 
+        carrito_productos = Productos.objects.filter(id__in = carrito_producto_id)
+        suma = len(carrito_productos) + len(carrito_servicios)
         
         contexto ={
+            'carrito_servicios' :carrito_servicios,
+            'carrito_productos' :carrito_productos,
+            'suma' :suma,
             'barberos' : barberos,
             'servicios' :servicios,
-            'carrito_servicios' :carrito_servicios
         }
         return render(request,'reservas/reservas_citas.html',contexto)
     if verificar.get('rol') != 'C':
@@ -192,7 +199,20 @@ def ver_citas(request):
         try:
             usuario = Usuarios.objects.get(pk = verificar['id'])
             cliente = usuario.clientes.first()
+            
+            
+            carrito_id = request.session.get('carrito_servicios',[])
+            carrito_producto_id = request.session.get('carrito_productos',[])
+            
+            
+            carrito_servicios = Servicios.objects.filter(id__in = carrito_id) # Filter devuelve una lista 
+            carrito_productos = Productos.objects.filter(id__in = carrito_producto_id)
+            suma = len(carrito_productos) + len(carrito_servicios)
+            
             contexto={
+                'carrito_servicios' :carrito_servicios,
+                'carrito_productos' :carrito_productos,
+                'suma' :suma,
                 'cliente' : cliente
             }
             return render(request,'clientes/ver_citas.html',contexto)
@@ -249,10 +269,12 @@ def ver_tienda(request):
         carrito_producto_id = request.session.get('carrito_productos',[])
         carrito_servicios = Servicios.objects.filter(id__in = carrito_id) # Filter devuelve una lista 
         carrito_productos = Productos.objects.filter(id__in = carrito_producto_id)
+        suma = len(carrito_productos) + len(carrito_servicios)
         contexto = {
             'carrito_servicios' :carrito_servicios,
             'carrito_productos' :carrito_productos,
             'ultimos_productos':ultimos_productos,
+            'suma' : suma,
             'productos': productos
         }
         return render(request,'clientes/ver_tienda.html',contexto)
@@ -278,15 +300,15 @@ def agregar_productos_carrito(request,id_producto):
         
         #Si no hay una sesion con el nombre carrito_servicios
         if 'carrito_productos' not in request.session:
-            request.session['carrito_servicios'] = [] #Creamos la sesion carrito_servicios que sera igual a una lista vacia
+            request.session['carrito_productos'] = [] #Creamos la sesion carrito_servicios que sera igual a una lista vacia
         
-        carrito = request.session['carrito_productos'] #asigno una variable a esa sesion que creamos en este caso la llame igual
+        carrito_productos = request.session['carrito_productos'] #asigno una variable a esa sesion que creamos en este caso la llame igual
         
         #si el servicio_id no esta en la lista carrito se agrega , asi se evitan duplicados de servicios
-        if id_producto not in carrito:
-            carrito.append(id_producto)
+        if id_producto not in carrito_productos:
+            carrito_productos.append(id_producto)
         
-        request.session["carrito_productos"] = carrito  # Guardar en sesión
+        request.session["carrito_productos"] = carrito_productos  # Guardar en sesión
         return redirect('ver_tienda')
     #Exepcion si el id ingresado en l html no se encuentra en el id del modelo 
     except Productos.DoesNotExist:
@@ -294,6 +316,20 @@ def agregar_productos_carrito(request,id_producto):
     except Exception as e:
         messages.info(request,f'❌ ERROR : {e}')
     return redirect('index')
+
+def eliminar_productos_carrito(request,id_producto):
+    verificar = request.session.get('logueado',False)
+    if not verificar or  verificar['rol'] != 'C':
+        messages.warning(request,'⚠️ WARNING: No Tienes Permitido Hacer Esto')
+        return redirect('index')
+    try:
+        producto = Productos.objects.get(pk = id_producto)
+        producto.delete()
+        return redirect(request.META.get('HTTP_REFERER', 'index'))
+    except Productos.DoesNotExist:
+        messages.warning(request,'❌ ERROR: No Datos Sobre Productos Asociados')
+    return redirect('index')
+
 #endregion
 
 #endregion

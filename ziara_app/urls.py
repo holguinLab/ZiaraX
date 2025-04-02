@@ -3,14 +3,14 @@ from . views import *
 
 urlpatterns=[
     path('',index,name='index'),
-
     #Esta ruta es la que retorna un json para usarlo en la api de pixaby 
     path('obtener_servicios/',obtener_servicios,name='obtener_servicios'),
     path('obtener_productos/',obtener_productos,name='obtener_productos'),
     
-    # PANEL DE SESION
+    # region PANEL DE SESION Login , Register
     path('login/',login,name='login'),
     path('register/',register,name='register'),
+    #endregion
     
     #region PANEL ADMIN 
     path('admin_panel/',admin_panel,name='admin_panel'),
@@ -60,6 +60,7 @@ urlpatterns=[
     # region Productos
     path('ver_tienda/',ver_tienda,name='ver_tienda'),
     path('agregar_productos_carrito/<int:id_producto>/',agregar_productos_carrito,name='agregar_productos_carrito'),
+    path('eliminar_productos_carrito/<int:id_producto>/',eliminar_productos_carrito,name='eliminar_productos_carrito'),
 
     #endregion
     #endregion

@@ -1,4 +1,4 @@
-{%extends 'base.html'%}
+{%extends 'index.html'%}
 {%load static%}
 {%block titulo %}Mis Citas{%endblock%}
 {%block main%}
@@ -48,18 +48,5 @@
         {%endfor%}
     </div>
 </div>
-
-
 {%endblock%}
 
-
-
-<!-- 
-{{cliente}}
-{%for cita in cliente.cita_cliente.all%}
-    <br>
-    {%for servicio in cita.citas.all%}
-        <br>
-        {{servicio.servicio}}
-    {%endfor%}
-{%endfor%} -->
