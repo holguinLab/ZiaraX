@@ -39,51 +39,70 @@
 
 {%block main %}
 {%if request.session.logueado.rol == 'C' or not request.session.logueado %}
-<div class=" container-fluid d-flex  flex-column gap-5" style="color: #F2F2F2;">
+<div class=" container-fluid d-flex  flex-column " style="color: #F2F2F2;">
 
-    <div class="row d-flex p-3  align-items-center ">
-        <div class="col-md-6">
+    <div class="row d-flex p-3 align-items-center ">
+        <div class="col-md-6 col-lg-5">
             <h1 class="display-1  fw-bold " style="color: #717171;">Eleva tu estilo con <span
                     style="color: #66BB69;">Ziara</span></h1>
-            <p class=" fs-5 fw-semibold" style="color: #263238;">Donde la precisión se encuentra con la pasión. Más que
-                un corte, una experiencia.</p>
-            <a href="{%url 'reservas_citas' %}"><button class="btn mt-5 shadow-lg  btn-lg fs-4  fw-semibold fs-6"
-                    style="color: #ffffff; background-color: #263238;">Reservar Cita </button></a>
+            <p class=" fs-5 fw-semibold" style="color: #263238;">Donde la precisión se encuentra con la pasión. Más que un corte, una experiencia.</p>
+
+            <div class="d-flex gap-3">
+                <a href="{%url 'reservas_citas' %}">
+                    <button class="btn mt-5 shadow-lg  btn-lg fs-4  fw-semibold fs-6" style="color: #ffffff; background-color: #263238;">Reservar Cita </button>
+                </a>
+    
+                <a href="{%url 'ver_tienda' %}">
+                    <button class="btn mt-5 shadow-lg  btn-lg fs-4 btn-outline-secondary  fw-semibold fs-6" > Ver Tienda </button>
+                </a>
+            </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 col-lg-6">
             <img src="{% static 'img/seccion1.2.svg' %}" class="img-fluid" alt="Imagen descriptiva">
         </div>
     </div>
 
-    <div class="row  d-flex p-5  justify-content-around mt-5 gap-5" style="background-color: #ffffff;">
+    <div id="servicios" class="row  d-flex p-5 mb-0  justify-content-around mt-5 gap-5" style="background-color: #ffffff;">
         <h3 class="display-4  fw-bold text-center " style="color: #717171;">Nuestros <span style="color: #66BB69;"">Servicios</span></h3>
 
 
         {%for servicio in servicios%}
-        <div id="card_servicios" class="card shadow-lg p-0" style="width: 18rem;">
+        <div id="card" class="card shadow-lg p-0" style="width: 18rem;">
                 <img id="img_{{servicio.id}}" class="card-img-top  " alt="Foto Servicio : {{servicio.nombre}}">
                 <div class="card-body text-center">
                     <h5 class="card-title">{{servicio.nombre}}</h5>
                     <p class="card-text">Desde {{servicio.precio}} $ </p>
                 </div>
-    </div>
-    {%endfor%}
-</div>
+        </div>
+        {%endfor%}
+    </div> 
 
-</div>
+    <div id="productos" class="row  d-flex p-5  justify-content-around  gap-5" style="background-color: #ffffff;">
+        <h3 class="display-4 mb-5 fw-bold text-center " style="color: #717171;">Productos <span style="color: #66BB69;"">Destacados</span></h3>
 
+        {%for producto in productos%}
+        <div id="card" class="card shadow-lg p-0 mt-5" style="width: 18rem;">
+                <img id="img_{{producto.id}}" class="card-img-top  " alt="Foto Servicio : {{producto.nombre}}">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{producto.nombre}}</h5>
+                    <p class="card-text">Desde {{producto.precio}} $ </p>
+                </div>
+        </div>
+        {%endfor%}
+    </div> 
+</div>
 {%endif%}
 {%endblock%}
 
 
 {%block estilos%}
 <style>
-    #card_servicios {
+    #card {
         transition: transform 0.6s ease-in-out;
         /* Suaviza la animación */
     }
 
-    #card_servicios:hover {
+    #card:hover {
         transform: scale(1.2);
         cursor: pointer;
     }
@@ -92,4 +111,5 @@
 
 {%block js%}
 <script src="{%static 'js/index_servicios.js'%}"></script>
+<script src="{%static 'js/index_productos.js'%}"></script>
 {%endblock%}

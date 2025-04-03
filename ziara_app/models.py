@@ -79,6 +79,8 @@ class Productos(models.Model):
         ("B","Barba"),
         ("C","Cabello"),
         ("R","Rostro"),
+        ("N","Natural"),
+        ("P","Cuerpo"),
     )
     categoria = models.CharField(max_length=1,choices=CATEGORIAS,default='')
     def __str__(self):

@@ -49,9 +49,13 @@
                             <h6 class="card-subtitle small me-auto mb-2 text-muted">{{ servicio.precio }} $</h6>
                             <p class="card-text text-center"> {{servicio.descripcion}} </p>
                             <div class="d-flex flex-column gap-3">
+                                {%if request.session.logueado.rol == 'C' %}
                                 <a href="{% url 'agregar_servicio_carrito' servicio.id %}" class="btn btn-outline-success">
                                     <i class="bi bi-cart-plus"></i> Agregar
                                 </a>
+                                {%else%}
+                                    <p class="text-danger fw-bold text-center">🔑 Regístrate o inicia sesión para reservar</p>
+                                {%endif%}
                                 <span class=" ms-auto bg-secondary badge rounded-2 p-1 text-withe fw-bold "> {{servicio.duracion}} </span>
                             </div>
                         </div>

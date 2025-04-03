@@ -26,6 +26,7 @@ from django.core.mail import send_mail
 # Esta funcion solo muestra el index.html cuando se llama 
 def index(request):
     servicios = Servicios.objects.all()
+    productos = Productos.objects.order_by('-id')[:4]
     carrito_id = request.session.get('carrito_servicios',[])
     carrito_producto_id = request.session.get('carrito_productos',[])
     
@@ -37,7 +38,8 @@ def index(request):
         'carrito_servicios' :carrito_servicios,
         'carrito_productos' :carrito_productos,
         'suma' :suma,
-        'servicios':servicios
+        'servicios':servicios,
+        'productos':productos
     }
     return render(request,'index.html',contexto)
 

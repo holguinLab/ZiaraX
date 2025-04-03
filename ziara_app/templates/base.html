@@ -56,18 +56,31 @@
                 <ul class="navbar-nav ms-auto  mb-lg-0 gap-2 ">
                     {%if request.session.logueado.rol == 'C' %}
                         <li class="nav-item">
-                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">En proceso</a>
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'index'%}">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">En proceso</a>
-                        </li>
-                        <li class="nav-item">
-                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="#">En proceso</a>
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'ver_tienda'%}">Tienda</a>
                         </li>
                         
                         <li class="nav-item">
-                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'ver_citas'%} ">Mis Citas</a>
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'ver_citas'%} ">Citas</a>
+                        </li>   
+                    {%endif%}
+                    
+                    {%if not request.session.logueado %}
+                        <li class="nav-item">
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'index'%}">Home</a>
                         </li>
+                        <li class="nav-item">
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'ver_tienda'%}">Tienda</a>
+                        </li>
+                        <li class="nav-item">
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'index' %}.#servicios">Servicios</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'reservas_citas'%} ">Reservas</a>
+                        </li>   
                     {%endif%}
                 </ul>
 
@@ -126,9 +139,10 @@
                             <div class="d-flex justify-content-around">
                                 <div>
                                     <!-- Carrito -->
-                                    {%block carrito%} {%endblock%}
+                                    {%if request.session.logueado.rol == 'C'%}
+                                        {%block carrito%} {%endblock%}
+                                    {%endif%}
                                     
-
                                     <button class="btn btn-success dropdown-toggle btn-sm m-2 " type="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
                                             Perfil

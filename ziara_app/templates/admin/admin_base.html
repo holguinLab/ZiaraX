@@ -56,7 +56,7 @@
             <button class="btn btn-dark d-lg-none m-2" type="button" data-bs-toggle="offcanvas"data-bs-target="#sidebarMenu"><i class="bi bi-list"></i> Menú</button>
 
             <!-- Logo -->
-            <a class="navbar-brand text-light pt-0" href="{%url 'ver_perfil' request.session.logueado.id%}">
+            <a class="navbar-brand text-light pt-0" href="{%url 'admin_panel' %}">
                 <img src="{% static 'img/logo5.png' %}" alt="Ziara Logo" width="110">
             </a>
             <div>
@@ -128,13 +128,12 @@
                 <a class="nav-link text-light" href="{%url 'listar_usuarios'%}"><i class="bi bi-person-badge"></i> Usuarios</a>
                 <a class="nav-link text-light" href="{%url 'listar_citas'%}"><i class="bi bi-calendar-check"></i> Citas</a>
                 <a class="nav-link text-light" href="{%url 'listar_servicios'%}"><i class="bi bi-scissors"></i> Servicios</a>
-                <a class="nav-link text-light" href="{% url 'inventario' %}"><i class="bi bi-box-seam"></i> Inventario</a>
+                <a class="nav-link text-light" href="{%url 'listar_productos'%}"><i class="bi bi-box-seam-fill"></i> Productos</a>
+                <a class="nav-link text-light" href="{% url 'inventario' %}"><i class="bi bi-archive-fill"></i> Inventario</a>
+                <hr>
                 <a class="nav-link text-light" href="#"><i class="bi bi-gear"></i> Configuración</a>
-
-                <a class="nav-link text-light" href="{%url 'ver_perfil' request.session.logueado.id%}"><i class="bi bi-scissors"></i> Editar Perfil</a>
-
-                <a class="nav-link text-light" href="{%url 'recuperar_password'%}"><i class="bi bi-scissors"></i> Cambiar Contraseña</a>
-                
+                <a class="nav-link text-light" href="{%url 'ver_perfil' request.session.logueado.id%}"><i class="bi bi-person-lines-fill"></i> Editar Perfil</a>
+                <a class="nav-link text-light" href="{%url 'recuperar_password'%}"><i class="bi bi-lock-fill"></i> Cambiar Contraseña</a>
                 <hr class="text-light">
                 <a class="nav-link text-danger" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a>
                 
