@@ -27,6 +27,7 @@ from django.core.mail import send_mail
 def index(request):
     servicios = Servicios.objects.all()
     productos = Productos.objects.order_by('-id')[:4]
+    barberos = Barberos.objects.all()
     carrito_id = request.session.get('carrito_servicios',[])
     carrito_producto_id = request.session.get('carrito_productos',[])
     
@@ -39,7 +40,8 @@ def index(request):
         'carrito_productos' :carrito_productos,
         'suma' :suma,
         'servicios':servicios,
-        'productos':productos
+        'productos':productos,
+        'barberos':barberos
     }
     return render(request,'index.html',contexto)
 
@@ -80,18 +82,18 @@ def reservas_citas (request):
         }
         return render(request,'reservas/reservas_citas.html',contexto)
     if verificar.get('rol') != 'C':
-        messages.info(request,'❌ ERROR :No Puedes Hacer Esto')
+        messages.warning(request,'⚠️ WARNING : No Puedes Hacer Esto')
         return redirect('index')
 
 def agregar_servicio_carrito(request,servicio_id): # servicio_id que viene del html
     # Si no hay session de loguedo aparece un errro y redirije a index
     verificar = request.session.get('logueado',False)
     if not verificar:
-        messages.warning(request,'❌ ERROR : No Tienes Permitido Hacer Esto')
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     #Si la session tiene como rol administrador o barbero tampoco tendra permitido agregar servicios al carrito
     elif verificar['rol'] != 'C':
-        messages.warning(request,'❌ ERROR : No Tienes Permitido Hacer Esto')
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     try:
         #Se obtiene y se compara el servicio con el id del servicio en el modelo con el id  que se ingresa en el html
@@ -123,10 +125,10 @@ def eliminar_elementos_carrito(request,servicio_id):
     #creacion de variable para saber si dentro de las sesiones hay una que se llama logueado 
     verificar = request.session.get('logueado',False)
     if not verificar :
-        messages.error(request,'❌ ERROR: No Tienes Permitido Hacer esto')
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     elif verificar['rol'] != 'C':
-        messages.error(request,'❌ ERROR: No Tienes Permitido Hacer esto')
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     try:
         if verificar_carrito: # si existe guardo la sesion en una varible 
@@ -176,7 +178,7 @@ def registrar_citas(request):
                         cita_servicio.save()
                     #vaciamos el carrito con los servicios cuanto se agrega a cita servicios
                     request.session['carrito_servicios'] = []
-                    messages.success(request,'Su cita a sido agendada correctamente')
+                    messages.success(request,' ✅ MENSAJE :  Cita Agendada Con Exito ')
                     return redirect('index')
                 return redirect('index')
             except Citas.DoesNotExist:
@@ -196,8 +198,8 @@ def registrar_citas(request):
     return redirect('index')
 
 def ver_citas(request):
-    verificar =request.session.get('logueado',[])
-    if verificar['rol'] == 'C':
+    verificar =request.session.get('logueado',{})
+    if verificar.get('rol') == 'C':
         try:
             usuario = Usuarios.objects.get(pk = verificar['id'])
             cliente = usuario.clientes.first()
@@ -228,8 +230,8 @@ def ver_citas(request):
         return redirect('index')
 
 def confirmar_citas(request,id_cita):
-    verificar = request.session.get('logueado',[])
-    if verificar['rol'] == 'C':
+    verificar = request.session.get('logueado',{})
+    if verificar.get('rol') == 'C':
         try:
             cita = Citas.objects.get(pk = id_cita)
             cita.estado = 'PRO'
@@ -241,12 +243,12 @@ def confirmar_citas(request,id_cita):
             messages.info(request,f' ❌ ERROR : {e}')
         return redirect('index')
     else:
-        messages.warning(request,'❌ ERROR: No Tienes Permito Hacer Esto')
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
 
 def cancelar_citas(request,id_cita):
-    verificar = request.session.get('logueado',[])
-    if verificar['rol'] == 'C':
+    verificar = request.session.get('logueado',{})
+    if verificar.get('rol') == 'C':
         try:
             cita = Citas.objects.get(pk = id_cita)
             cita.delete()
@@ -257,7 +259,7 @@ def cancelar_citas(request,id_cita):
             messages.info(request,f' ❌ ERROR : {e}')
         return redirect('index')
     else:
-        messages.warning(request,'❌ ERROR: No Tienes Permito Hacer Esto')
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
 #endregion
 
@@ -281,7 +283,7 @@ def ver_tienda(request):
         }
         return render(request,'clientes/ver_tienda.html',contexto)
     else:
-        messages.error(request,'❌ ERROR : No Tienes Permito Hacer Esto')
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
 
 
@@ -289,11 +291,11 @@ def agregar_productos_carrito(request,id_producto):
     # Si no hay session de loguedo aparece un errro y redirije a index
     verificar = request.session.get('logueado',False)
     if not verificar:
-        messages.warning(request,'❌ ERROR : No Tienes Permitido Hacer Esto')
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     #Si la session tiene como rol administrador o barbero tampoco tendra permitido agregar servicios al carrito
     elif verificar['rol'] != 'C':
-        messages.warning(request,'❌ ERROR : No Tienes Permitido Hacer Esto')
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     try:
         #Se obtiene y se compara el servicio con el id del servicio en el modelo con el id  que se ingresa en el html
@@ -366,22 +368,16 @@ def hacer_imagen_redonda(imagen, tamaño=(150, 150)):
 #region ADMIN PANEL
 def admin_panel(request):
     verificar = request.session.get('logueado',False)
-    if verificar == False :
-        messages.warning(request,'ERROR : Debes Iniciar Sesion Primero ')
-        return redirect('login')
-    elif not verificar['rol'] == 'A':
-        messages.warning(request,'ERROR : NO TIENES LOS PERMISOS NECESARIOS 🚫 ')
+    if not verificar or  verificar['rol'] != 'A':
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     return render(request,'admin/inicio.html')
 
 #region USUARIOS
 def listar_usuarios(request):
     verificar = request.session.get('logueado',False)
-    if not  verificar   :
-        messages.info(request,'Debes Iniciar Sesion Primero')
-        return redirect('index')
-    elif not verificar['rol'] == 'A':
-        messages.warning(request,'Permiso denegado')
+    if not verificar or  verificar['rol'] != 'A':
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     else:
         q = Usuarios.objects.all()
@@ -398,11 +394,8 @@ def listar_usuarios(request):
 #region SERVICIOS
 def listar_servicios(request):
     verificar = request.session.get('logueado',False)
-    if not verificar :
-        messages.info(request,'Debes Iniciar Sesion Primero')
-        return redirect('index')
-    elif not verificar['rol'] == 'A' :
-        messages.warning(request,'No Tienes Permisos Necesarios Para Hacer Esto')
+    if not verificar or verificar['rol'] != 'A' :
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     if request.method == 'POST':
         id=request.POST.get('id')
@@ -415,10 +408,10 @@ def listar_servicios(request):
             servicio.categoria = request.POST.get('categoria')
             servicio.img_url = request.POST.get('img_url') # El ID QUE TIENEN LAS IMAGENES DE PIXABY
             servicio.save()
-            messages.success(request,'✅ Servicio Actualizado Correctamente')
+            messages.success(request,'✅ MENSAJE : Servicio Actualizado Correctamente')
             return redirect('listar_servicios')
         except Servicios.DoesNotExist:
-            messages.success(request,'❌ No hay Servicios Asociados')
+            messages.success(request,'❌ ERROR : No hay Servicios Asociados')
         except Exception as e:
             messages.error(request,f' ❌ ERROR : {e}')
         return redirect('listar_servicios')
@@ -433,11 +426,8 @@ def listar_servicios(request):
 
 def nuevo_servicio(request):
     verificar = request.session.get('logueado',False)
-    if not verificar :
-        messages.info(request,'Debes Iniciar Sesion Primero')
-        return redirect('index')
-    elif not verificar['rol'] == 'A' :
-        messages.warning(request,'No Tienes Permisos Necesarios Para Hacer Esto')
+    if not verificar or  verificar['rol'] != 'A':
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     if request.method == 'POST':
         try:
@@ -446,7 +436,7 @@ def nuevo_servicio(request):
                 precio = request.POST.get('precio'),
             )
             nuevo.save()
-            messages.success(request,' ✅ Servicio Agregado Con Exito')
+            messages.success(request,' ✅ MENSAJE :  Servicio Agregado Con Exito')
             return redirect('listar_servicios')
         except Exception as e:
             messages.error(request,f' ❌ ERROR : {e}')
@@ -455,19 +445,19 @@ def nuevo_servicio(request):
         return redirect('listar_servicios')
 
 def eliminar_servicio(request,id_servicio):
-    verificar = request.session.get('logueado',[])
-    if verificar['rol'] != 'A':
-        messages.warning(request,'❌ ERROR: No Tienes Permitido Hacer Esto')
+    verificar = request.session.get('logueado',{})
+    if verificar.get('rol') != 'A':
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     try:
         servicio = Servicios.objects.get(pk = id_servicio)
         servicio.delete()
-        messages.success(request,'Servicio Eliminado Correctamente')
+        messages.success(request,' ✅ MENSAJE : Servicio Eliminado Correctamente')
         return redirect('listar_servicios')
     except Servicios.DoesNotExist:
-        messages.error(request,'Error : No Hay Datos Sobre Servicios Asociados')
+        messages.error(request,' ❌ ERROR : No Hay Datos Sobre Servicios Asociados')
     except Exception as e:
-        messages.error(request,f'Error : {e}')
+        messages.error(request,f' ❌ ERROR : {e}')
     return redirect('listar_servicios')
 
 #endregion
@@ -475,12 +465,9 @@ def eliminar_servicio(request,id_servicio):
 #region BARBEROS
 def detalles_barberos(request,id_barbero):
     verificar = request.session.get('logueado',False)
-    if verificar == False :
-        messages.warning(request,'ERROR : Debes Iniciar Sesion Primero ')
+    if  not verificar or verificar['rol'] != 'A' :
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('login')
-    elif not verificar['rol'] == 'A':
-        messages.warning(request,'ERROR : NO TIENES LOS PERMISOS NECESARIOS 🚫 ')
-        return redirect('index')
     else:
         try:
             barbero = Barberos.objects.get(pk = id_barbero)
@@ -489,7 +476,7 @@ def detalles_barberos(request,id_barbero):
             }
             return render(request,'admin/usuarios/detalles_barberos.html',contexto)
         except Exception as e:
-            messages.error(request,f'ERROR : {e}')
+            messages.error(request,f' ❌ ERROR : {e}')
             return redirect('listar_usuarios')
 
 #endregion
@@ -497,11 +484,8 @@ def detalles_barberos(request,id_barbero):
 #region CITAS
 def listar_citas(request):
     verificar = request.session.get('logueado',False)
-    if not verificar :
-        messages.error(request,' ❌ ERROR : Debes iniciar sesion primero')
-        return redirect('index')
-    elif not verificar['rol'] == 'A' :
-        messages.error(request,' ❌ ERROR : No Tienes Permisos necesarios')
+    if not verificar  or verificar['rol'] != 'A':
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     q = Citas.objects.all()
     contexto = {
@@ -512,9 +496,9 @@ def listar_citas(request):
 
 #region INVENTARIO
 def inventario(request):
-    verificar = request.session.get('logueado',[])
-    if  verificar['rol'] != 'A'  :
-        messages.warning(request,'❌ ERROR: No Tienes Permitido Hacer Esto ')
+    verificar = request.session.get('logueado',{})
+    if  verificar.get('rol') != 'A'  :
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     if request.method == 'POST':
         id = request.POST.get('id')
@@ -522,7 +506,7 @@ def inventario(request):
             producto = Inventarios.objects.get(pk = id)
             producto.stock = request.POST.get('stock')
             producto.save()
-            messages.success(request,' ✅ Producto Actualizado Con Exito ')
+            messages.success(request,' ✅ MENSAJE : Producto Actualizado Con Exito ')
             return redirect('inventario')
         except Inventarios.DoesNotExist:
             messages.success(request,'❌ ERROR : No Hay Datos Sobre Productos Asociados ')
@@ -540,11 +524,10 @@ def inventario(request):
 #region PRODUCTOS
 
 def listar_productos(request):
-    verificar = request.session.get('logueado',[])
-    if  verificar['rol'] != 'A'  :
-        messages.warning(request,'❌ ERROR: No Tienes Permitido Hacer Esto ')
+    verificar = request.session.get('logueado',False)
+    if not verificar or  verificar['rol'] != 'A'  :
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
-    
     if request.method == 'POST' :
         try:
             id = request.POST.get('id')
@@ -555,7 +538,7 @@ def listar_productos(request):
             producto.categoria = request.POST.get('categoria')
             producto.img_url = request.POST.get('img_url') # El ID QUE TIENEN LAS IMAGENES DE PIXABY
             producto.save()
-            messages.success(request,' ✅ Producto Actualizado Con Exito ')
+            messages.success(request,' ✅ MENSAJE : Producto Actualizado Con Exito ')
             return redirect('listar_productos')
         except Productos.DoesNotExist:
             messages.success(request,'❌ ERROR : No Hay Datos Sobre Productos Asociados ')
@@ -572,11 +555,8 @@ def listar_productos(request):
 
 def nuevo_producto(request):
     verificar = request.session.get('logueado',False)
-    if not verificar :
-        messages.info(request,'Debes Iniciar Sesion Primero')
-        return redirect('index')
-    elif not verificar['rol'] == 'A' :
-        messages.warning(request,'No Tienes Permisos Necesarios Para Hacer Esto')
+    if not verificar or verificar['rol'] != 'A' :
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     if request.method == 'POST':
         try:
@@ -590,7 +570,7 @@ def nuevo_producto(request):
                 stock = 0
             )
             add_inventario.save()
-            messages.success(request,' ✅ Producto Agregado Con Exito')
+            messages.success(request,' ✅ MENSAJE : Producto Agregado Con Exito')
             return redirect('listar_productos')
         except Exception as e:
             messages.error(request,f' ❌ ERROR : {e}')
@@ -599,9 +579,9 @@ def nuevo_producto(request):
         return redirect('listar_productos')
 
 def detalle_producto(request,id_producto):
-    verificar = request.session.get('logueado',[])
-    if verificar['rol'] != 'A':
-        messages.warning(request,'❌ ERROR: No Tienes Permitido Hacer Esto')
+    verificar = request.session.get('logueado',False)
+    if not verificar or verificar['rol'] != 'A':
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     inventario_producto = Inventarios.objects.get(pk = id_producto)
     try:
@@ -615,25 +595,25 @@ def detalle_producto(request,id_producto):
         }
         return render(request,'admin/productos/detalle_productos.html',contexto)
     except Inventarios.DoesNotExist:
-            messages.error(request,'Error : No Hay Datos Sobre Productos Asociados')
+            messages.error(request,'❌ ERROR :No Hay Datos Sobre Productos Asociados')
     except Exception as e:
-        messages.error(request,f'Error : {e}')
+        messages.error(request,f'❌ ERROR : {e}')
     return redirect('listar_productos')
 
 def eliminar_producto(request,id_producto):
-    verificar = request.session.get('logueado',[])
-    if verificar['rol'] != 'A':
-        messages.warning(request,'❌ ERROR: No Tienes Permitido Hacer Esto')
+    verificar = request.session.get('logueado',False)
+    if not verificar or verificar['rol'] != 'A':
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     try:
         producto = Productos.objects.get(pk = id_producto)
         producto.delete()
-        messages.success(request,'Producto Eliminado Correctamente')
+        messages.success(request,' ✅ MENSAJE : Producto Eliminado Correctamente')
         return redirect('listar_productos')
     except Productos.DoesNotExist:
-        messages.error(request,'Error : No Hay Datos Sobre Productos Asociados')
+        messages.error(request,'❌ ERROR :No Hay Datos Sobre Productos Asociados')
     except Exception as e:
-        messages.error(request,f'Error : {e}')
+        messages.error(request,f'❌ ERROR : {e}')
     return redirect('listar_productos')
 
 #endregion
@@ -669,35 +649,35 @@ def login(request):
                     nombre = 'Explorador'
                 # segun el rol que inicia sesion se muestra un mensaje si es admin , se redirecciona al panel del administrador
                 if verificar['rol'] == 'A':
-                    messages.success(request,f'Inicio de Sesion Exitoso , Hola de nuevo  Admin / {nombre}')
+                    messages.success(request,f'✅ MENSAJE : Inicio de Sesion Exitoso , Hola de nuevo  Admin / {nombre}')
                     return redirect('admin_panel')
                 elif verificar['rol'] == 'B':
-                    messages.success(request,f'Inicio de Sesion Exitoso , Hola de nuevo  Barbero / {nombre}')
+                    messages.success(request,f'✅ MENSAJE : Inicio de Sesion Exitoso , Hola de nuevo  Barbero / {nombre}')
                     return redirect('index')
                 else:
-                    messages.success(request,f'Inicio de Sesion Exitoso , Hola de nuevo  Colega  / {nombre}')
+                    messages.success(request,f'✅ MENSAJE : Inicio de Sesion Exitoso , Hola de nuevo  Colega  / {nombre}')
                     return redirect('index')
             #Si la contraseña no concide con el hash guardado
             else:
                 messages.error(request,'No existe el usuario')
         #Si el usuario no existe en la base de datos
         except Usuarios.DoesNotExist :
-            messages.error(request,'ERROR : No se encontraron cuentas asociadas')
+            messages.error(request,'❌ ERROR : No se encontraron cuentas asociadas')
             request.session['logueado'] = None
         # si el usuario no existe en la base de datos 
         except NameError :
-            messages.error(request,'ERROR : No se encontraron cuentas asociadas')
+            messages.error(request,'❌ ERROR : No se encontraron cuentas asociadas')
             request.session['logueado'] = None
         # Errores internos
         except Exception as e :
-            messages.error(request,f'ERROR :{e}')
+            messages.error(request,f'❌ ERROR :{e}')
             request.session['logueado'] = None
         return redirect('login')
     else:
         # si el usuario ya incio sesion , no podra devolverse a esta vista , debera cerrar sesion 
         verificar = request.session.get('logueado',False)
         if verificar:
-            messages.error(request ,'Ya Iniciaste Sesion ')
+            messages.info(request , 'ℹ️ INFO : Ya Iniciaste Sesion , No Puedes Hacerlo Otra Vez')
             return redirect('index')
         return render(request,'panel/login.html')
 
@@ -705,18 +685,18 @@ def login(request):
 def logout(request):
     #si no esta logueado mostrar error y redirecciona al login
     verificar = request.session.get('logueado',False)
-    if verificar == False :
-        messages.warning(request,'ERROR : Lo Siento Debes Iniciar Sesion Primero')
+    if not verificar  :
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('login')
     #si ya inicio sesion podra destuir la sesion 
     else:
         try:
             del request.session['logueado']
-            messages.success(request,'Se Cerro La Sesion Correctamente')
+            messages.success(request,'✅ MENSAJE : Se Cerro La Sesion Correctamente')
             return redirect('index')
         # mas que todo este error es por si falla la conexion 
         except Exception as e:
-            messages.info(request,f'Ocurrio Un Error Inesperado Intente Nuevamente Detalles: {e}')
+            messages.info(request,f'❌ ERROR : Ocurrio Un Error Inesperado Intente Nuevamente Detalles: {e}')
         return redirect('index')
 
 #REGISTRAR USUARIOS
