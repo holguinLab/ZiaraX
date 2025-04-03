@@ -62,7 +62,7 @@ def obtener_productos(request):
 def reservas_citas (request):
     verificar = request.session.get('logueado',{})
     carrito_id = request.session.get('carrito_servicios',[])
-    if not verificar or verificar:
+    if not verificar or verificar['rol'] == 'C':
         
         barberos = Barberos.objects.all()
         servicios = Servicios.objects.all()
