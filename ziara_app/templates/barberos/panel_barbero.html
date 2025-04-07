@@ -1,0 +1,81 @@
+{%extends 'index.html'%}
+{%load static%}
+{%block titulo %}Resevar{%endblock%}
+{%block main%}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Barra lateral -->
+        <div class="col-md-3">
+            <div class="card shadow-lg bg-primary text-white text-center">
+                <div class="card-body">
+                    <img src="{{request.session.logueado.foto}}" class="rounded-circle mb-3" width="80">
+                    <h4 class="fw-bold"> {{barbero.usuario_barbero.nombre_completo}} </h4>
+                    <p class="fst-italic"> {{barbero.especialidad}} </p>
+                    <a href="{%url 'ver_perfil' request.session.logueado.id %}" class="btn btn-light btn-sm">Editar Perfil</a>
+
+                </div>
+            </div>
+            <div class="mt-3">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-success text-white fw-bold">📊 Estadísticas</div>
+                    <div class="card-body">
+                        <p class="card-text">50 cortes esta semana</p>
+                        <p class="card-text">Más solicitado: <b>Fade</b></p>
+                        <p class="card-text">Calificación: ⭐ 4.7</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="col-md-9">
+            <!-- Notificaciones -->
+            <div class="alert alert-warning d-flex align-items-center shadow">
+                <i class="bi bi-bell-fill me-2"></i>
+                <div>¡Nueva cita programada para las 16:00 con Andrea C.!</div>
+            </div>
+            
+            <!-- Tabs para organizar el contenido -->
+            <ul class="nav nav-tabs" id="barberTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="agenda-tab" data-bs-toggle="tab" data-bs-target="#agenda" type="button" role="tab">📅 Agenda</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pendientes-tab" data-bs-toggle="tab" data-bs-target="#pendientes" type="button" role="tab">⏳ Pendientes</button>
+                </li>
+            </ul>
+            
+            <div class="tab-content mt-3" id="barberTabsContent">
+                <!-- Agenda Diaria -->
+                <div class="tab-pane fade show active" id="agenda" role="tabpanel">
+                    <div class="card shadow-lg">
+                        <div class="card-header bg-dark text-white fw-bold text-center">📅 Agenda Diaria</div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                {%for cita in cita_barbero%}
+                                
+                                <li class="list-group-item">{{cita.cliente.usuario_cliente.nombre_completo}} - {%for servicio in cita.citas.all%}  <span> {{servicio.servicio.nombre}}  ,</span> {%endfor%} </li>
+                                
+                                {%endfor%}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Citas Pendientes -->
+                <div class="tab-pane fade" id="pendientes" role="tabpanel">
+                    <div class="card shadow-lg">
+                        <div class="card-header bg-dark text-white fw-bold text-center">⏳ Citas Pendientes</div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{%endblock%}

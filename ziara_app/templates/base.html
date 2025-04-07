@@ -47,9 +47,16 @@
             </button>
 
             <!-- Logo -->
+            {%if request.session.logueado.rol == 'C' or not request.session.logueado%}
             <a class="navbar-brand text-light pt-0" href="{% url 'index'%}">
                 <img src="{% static 'img/logo5.png' %}" alt="Ziara Logo" width="110" height="auto">
             </a>
+            {%endif%}
+            {%if request.session.logueado.rol == 'B'%}
+            <a class="navbar-brand text-light pt-0" href="{% url 'panel_barbero'%}">
+                <img src="{% static 'img/logo5.png' %}" alt="Ziara Logo" width="110" height="auto">
+            </a>
+            {%endif%}
 
             <!-- Menú colapsable -->
             <div class="collapse navbar-collapse pt-0" id="navbarTogglerDemo01">
@@ -147,6 +154,7 @@
                                         data-bs-toggle="dropdown" aria-expanded="false">
                                             Perfil
                                     </button>
+                                    {%if request.session.logueado.rol ==  'C'%}
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li><a class="dropdown-item" href="{%url 'ver_perfil' request.session.logueado.id%}">Editar Perfil</a></li>
                                         <li><a class="dropdown-item" href="#">Configuración</a></li>
@@ -160,6 +168,19 @@
                                     <a class="navbar-brand" href="{%url 'ver_perfil' request.session.logueado.id%}">
                                         <img src="{{ request.session.logueado.foto }}" alt="Foto de Perfil" width="40" height="40" class="d-inline-block rounded-circle">
                                     </a>
+                                    {%else%}
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item" href="{%url 'ver_perfil' request.session.logueado.id%}">Editar Perfil</a></li>
+                                            <li><a class="dropdown-item" href="#">Configuración</a></li>
+                                            <li><a class="dropdown-item" href="{%url 'recuperar_password'%}">Cambiar Contraseña</a></li>
+                                            <hr>
+                                            <li><a class="dropdown-item text-danger" href="{%url 'logout'%}">Cerrar Sesión</a></li>
+                                        </ul>
+
+                                        <a class="navbar-brand" href="{%url 'ver_perfil' request.session.logueado.id%}">
+                                            <img src="{{ request.session.logueado.foto }}" alt="Foto de Perfil" width="40" height="40" class="d-inline-block rounded-circle">
+                                        </a>
+                                    {%endif%}
                                 </div>
                                 
                             </div>

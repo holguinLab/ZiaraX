@@ -65,6 +65,11 @@ urlpatterns=[
     #endregion
     #endregion
     
+    #region BARBEROS
+    path('panel_barbero',panel_barbero,name='panel_barbero'),
+    
+    #endregion
+    
     # region PANEL DE USUARIO
     path('logout/',logout,name='logout'),
     path('recuperar_password/',recueperar_password,name='recuperar_password'),

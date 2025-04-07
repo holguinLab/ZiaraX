@@ -25,13 +25,14 @@ from django.core.mail import send_mail
 
 # Esta funcion solo muestra el index.html cuando se llama 
 def index(request):
+    verificar = request.session.get('logueado',{})
+    if verificar.get('rol') == 'B':
+        return redirect('panel_barbero')
     servicios = Servicios.objects.all()
-    productos = Productos.objects.order_by('-id')[:4]
+    productos = Productos.objects.order_by('-id')[:5]
     barberos = Barberos.objects.all()
     carrito_id = request.session.get('carrito_servicios',[])
     carrito_producto_id = request.session.get('carrito_productos',[])
-    
-    
     carrito_servicios = Servicios.objects.filter(id__in = carrito_id) # Filter devuelve una lista 
     carrito_productos = Productos.objects.filter(id__in = carrito_producto_id)
     suma = len(carrito_productos) + len(carrito_servicios)
@@ -41,7 +42,7 @@ def index(request):
         'suma' :suma,
         'servicios':servicios,
         'productos':productos,
-        'barberos':barberos
+        'barberos':barberos,
     }
     return render(request,'index.html',contexto)
 
@@ -322,24 +323,65 @@ def agregar_productos_carrito(request,id_producto):
     return redirect('index')
 
 def eliminar_productos_carrito(request,id_producto):
+    #Creacion de varible para saber si dentro de la sesiones hay una que se llama carrito_servicios
+    verificar_carrito = request.session.get('carrito_productos',False)
+    #creacion de variable para saber si dentro de las sesiones hay una que se llama logueado 
     verificar = request.session.get('logueado',False)
-    if not verificar or  verificar['rol'] != 'C':
-        messages.warning(request,'⚠️ WARNING: No Tienes Permitido Hacer Esto')
+    if not verificar :
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
+        return redirect('index')
+    elif verificar['rol'] != 'C':
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     try:
-        producto = Productos.objects.get(pk = id_producto)
-        producto.delete()
+        if verificar_carrito: # si existe guardo la sesion en una varible 
+            carrito_productos = request.session['carrito_productos']
+            # comparo si el id que se obtiene desde el html esta en la lista de carrito_servicios
+            if id_producto in carrito_productos :
+                #Si esta uso el metdo de listas romove para eliminarlo
+                carrito_productos.remove(id_producto)
+                #Guardar los cambios en la sesion llamada carrito_servicios 
+                request.session['carrito_productos'] = carrito_productos
+        # Redirige a la página anterior (o a 'index' si no hay referencia)
         return redirect(request.META.get('HTTP_REFERER', 'index'))
-    except Productos.DoesNotExist:
-        messages.warning(request,'❌ ERROR: No Datos Sobre Productos Asociados')
+    except Servicios.DoesNotExist:
+        messages.error(request,f'❌ ERROR : No Hay Datos Sobre Servicios Asociados')
+    except Exception as e:
+        messages.error(request,f'❌ ERROR : {e}')
     return redirect('index')
+#endregion
 
 #endregion
 
+#region BARBEROS
+def panel_barbero(request):
+    verificar = request.session.get('logueado',False)
+    if not verificar or verificar['rol'] != 'B':
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
+        return redirect('index')
+    try:
+        usuario = Usuarios.objects.get(pk = verificar['id'])
+        barbero = usuario.barberos.first()
+        cita_barbero = barbero.cita_barbero.all()
+
+        contexto={
+            'barbero':barbero,
+            'cita_barbero' :cita_barbero,
+        } 
+        return render(request,'barberos/panel_barbero.html',contexto)
+    except Usuarios.DoesNotExist:
+        messages.warning(request,'❌ ERROR :No hay Datos Sobre Usuarios  Asociados')
+    except Barberos.DoesNotExist:
+        messages.warning(request,'❌ ERROR :No hay Datos Sobre Barberos Asociados')
+    except CitaServicios.DoesNotExist:
+        messages.warning(request,'❌ ERROR :No hay Datos Sobre Barberos Asociados')
+    except Citas.DoesNotExist:
+        messages.warning(request,'❌ ERROR :No hay Datos Sobre Barberos Asociados')
+    return redirect('index')
 #endregion
 
 #region PROCESO DE IMAGENES
-def hacer_imagen_redonda(imagen, tamaño=(150, 150)):
+def hacer_imagen_redonda(imagen, tamaño=(250, 250)):
     """
     Procesa la imagen para hacerla circular y del tamaño especificado.
     Retorna un objeto de archivo listo para ser guardado en el modelo.
@@ -653,7 +695,7 @@ def login(request):
                     return redirect('admin_panel')
                 elif verificar['rol'] == 'B':
                     messages.success(request,f'✅ MENSAJE : Inicio de Sesion Exitoso , Hola de nuevo  Barbero / {nombre}')
-                    return redirect('index')
+                    return redirect('panel_barbero')
                 else:
                     messages.success(request,f'✅ MENSAJE : Inicio de Sesion Exitoso , Hola de nuevo  Colega  / {nombre}')
                     return redirect('index')
