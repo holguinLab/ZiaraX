@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
+from django.core.validators import validate_image_file_extension  # Importa el validador
 # Create your models here.
 
 class Usuarios(models.Model):
@@ -8,7 +9,7 @@ class Usuarios(models.Model):
     nombre_completo = models.CharField(max_length=254 ,null=True,blank=True)
     telefono = models.CharField(max_length=16 ,null=True,blank=True)
     f_nacimiento = models.DateField( null=True,blank=True)
-    foto = models.ImageField(upload_to="fotos/",blank=True,null=True,default='fotos/predeterminado.png')
+    foto = models.ImageField(upload_to="fotos/",blank=True,null=True,default='fotos/predeterminado.png',validators=[validate_image_file_extension])
     username = models.CharField(max_length=10 , blank=True, null=True,default='')
     ROLES = (
         ("A","Admin"),

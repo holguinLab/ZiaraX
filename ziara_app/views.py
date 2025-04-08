@@ -433,6 +433,26 @@ def listar_usuarios(request):
             'barberos' :barberos
         }
         return render(request,'admin/usuarios/listar_usuarios.html',contexto)
+
+def eliminar_usuario(request,id_usuario):
+    verificar = request.session.get('logueado',False)
+    if not verificar or verificar['rol'] != 'A':
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
+        return redirect('index')
+    try:
+        usuario = Usuarios.objects.get(pk = id_usuario)
+        if usuario.tipoUsuario != 'A':
+            usuario.delete()
+            messages.success(request,' ✅ MENSAJES : Usuario eliminado correctamente  ')
+            return redirect('listar_usuarios')
+        else:
+            messages.warning(request,'⚠️ WARNING : No Puedes Eliminar A Un Administrador')
+            return redirect('listar_usuarios')
+    except Usuarios.DoesNotExist:
+        messages.error(request,' ❌ ERROR : No Hay Cuentas Sobre Usuarios Asociados')
+    except Exception as e:
+        messages.error(request,f'❌ ERROR : {e}')
+    return redirect('listar_usuarios')
 #endregion
 
 #region SERVICIOS
@@ -986,9 +1006,11 @@ def ver_perfil(request,id_usuario):
             del request.session['logueado']
             messages.info(request,'Tu información se ha actualizado. Por favor, inicia sesión nuevamente.')
             return redirect('index')
+        except ValidationError : 
+            messages.error(request,'Solo Archivos png,jpg')
         except Exception as e:
             messages.error(request,f'{e}')
-            return redirect('index')
+        return redirect('index')
     else:
         usuario = Usuarios.objects.get(pk = id_usuario)
         contexto ={

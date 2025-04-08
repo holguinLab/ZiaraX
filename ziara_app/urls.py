@@ -18,6 +18,7 @@ urlpatterns=[
     # USUARIOS 
     path('listar_usuarios/',listar_usuarios,name='listar_usuarios'),
     path('detalles_barberos/<int:id_barbero>/',detalles_barberos,name='detalles_barberos'),
+    path('eliminar_usuario/<int:id_usuario>',eliminar_usuario,name='eliminar_usuario'),
     
     #SERVICIOS
     path('listar_servicios/',listar_servicios,name='listar_servicios'),
@@ -77,4 +78,3 @@ urlpatterns=[
     path('ver_perfil/<int:id_usuario>/',ver_perfil,name='ver_perfil'),
     #endregion
 ]
-
