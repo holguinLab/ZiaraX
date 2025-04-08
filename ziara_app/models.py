@@ -3,8 +3,8 @@ from django.utils.timezone import now
 # Create your models here.
 
 class Usuarios(models.Model):
-    email = models.CharField(max_length=100,unique=True,null=False,blank=False)
-    password = models.CharField(max_length=128)
+    email = models.EmailField(unique=True,null=False,blank=False)
+    password = models.CharField(max_length=128,blank=False,null=False)
     nombre_completo = models.CharField(max_length=254 ,null=True,blank=True)
     telefono = models.CharField(max_length=16 ,null=True,blank=True)
     f_nacimiento = models.DateField( null=True,blank=True)

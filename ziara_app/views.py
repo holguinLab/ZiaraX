@@ -6,6 +6,9 @@ from .utils import * # Importacion de la funcion de incriptacion y verificacion 
 from django.db import IntegrityError
 from django.http import JsonResponse # para convertir la lista de notificacines en un json para trabajarla con ajax
 
+# Libreria para validacion de correos email y mensaje de error cuando no es correo 
+from django.core.exceptions import ValidationError  # Se usa para Hacer validaciones de campos especificos 
+from django.core.validators import validate_email # Se usa para validar si un campo es un correo 
 # region PILLOW # ! Librerias Para usar PILLOW 🏙️ 
 from django.core.files.base import ContentFile
 from PIL import Image, ImageDraw
@@ -45,7 +48,6 @@ def index(request):
         'barberos':barberos,
     }
     return render(request,'index.html',contexto)
-
 
 # vista que convierte la consulta de servicios en json para que la podamos usar en el script(js) de index_servicios.js
 def obtener_servicios(request):
@@ -761,9 +763,11 @@ def register(request):
             rol = request.POST.get('rol') # lo mismo pasa con el rol pero esta opcion si la muestro en el Panel del adminstrador , ya que solo el admin puede crear cuentas con rol  Admin y Barbero (Cuentas con rol Cliente no puede creear)
             password= request.POST.get('password') # Se optiene el password del html
             encriptada = hash_password(password) # se encripta la password del html 
+            email = request.POST.get('email')
             
             # Try para procesar el guardado de usuario en la BD
             try:
+                validate_email(email) # Valida que el correo sea tipo email antes de validar
                 # Se asigna la variable que guardara el usuario 
                 q = Usuarios(
                 email = request.POST.get('email'), # se obtine el email del formulario (en este caso esta funcion esta para funcionar atravves de una url asiganada en un action de un html)
@@ -830,16 +834,17 @@ def register(request):
                     )
                     
                     # Condicionales para cada rol evitar mensajes incoherentes o inapropiados o redirecciones no debibas 
-                    messages.success(request, "Correo enviado !!")
+                    messages.success(request, " ✅ MENSAJE :  Correo enviado !!")
                 except Exception as error :
-                    messages.error(request, f"No se pudo enviar el correo: {error}")
+                    messages.error(request, f" ❌ ERROR : NO SE PUEDE ENVIAR CORREO ")
                 return redirect('listar_usuarios')
 
+            except ValidationError :
+                messages.warning(request, '⚠️ WARNING : Escriba Un Correo Valido (@) ') # Si el correo no es tipo email muestra el mensaje
             except IntegrityError :
-                messages.error(request, 'ERROR : El correo ya esta en uso ')
-                
+                messages.error(request, '❌ ERROR : El correo ya esta en uso ') # Si el correo ya existe mostrar esta excepcion 
             except Exception as error :
-                messages.error(request, f"ERROR: {error}")
+                messages.error(request, f" ❌ ERROR: No Se puede crear la cuenta : {error}")
             return redirect('listar_usuarios')
 
         # si por alguna razon se pone la ruta register que es la que esta en url esta protegida para que aparezca el index
@@ -861,12 +866,14 @@ def register(request):
             foto = request.FILES.get('foto') # Estas opcion esta oculta en el html para todos los roles  pero la pongo para que se pueda procesar la foto decir si es se sube o no 
             password= request.POST.get('password') # Se optiene el password del html
             encriptada = hash_password(password) # se encripta la password del html 
+            email = request.POST.get('email'),
             
             # Try para procesar el guardado de usuario en la BD
             try:
+                validate_email(email)
                 # Se asigna la variable que guardara el usuario 
                 q = Usuarios(
-                email = request.POST.get('email'), # se obtine el email del formulario (en este caso esta funcion esta para funcionar atravves de una url asiganada en un action de un html)
+                email = email, # se obtine el email del formulario (en este caso esta funcion esta para funcionar atravves de una url asiganada en un action de un html)
                 password = encriptada,
                 nombre_completo = 'Explorador',
                 )
@@ -918,10 +925,12 @@ def register(request):
                     messages.error(request, f"No se pudo enviar el correo: {error}")
                 return redirect('login')
             
+            except ValidationError :
+                messages.warning(request, ' ⚠️ WARNING : Escriba Un Correo Valido (@) ')
             except IntegrityError :
-                messages.error(request, 'ERROR : El correo ya esta en uso ')
+                messages.error(request, ' ❌ ERROR : El correo ya esta en uso ')
             except Exception as error :
-                messages.error(request, f"ERROR: {error}")
+                messages.error(request, f" ❌ ERROR: No Se puede crear la cuenta : {error}")
             return redirect('login')
         # si por alguna razon se pone la ruta register que es la que esta en url esta protegida para que aparezca el index
         else:
