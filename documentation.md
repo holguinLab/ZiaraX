@@ -67,8 +67,8 @@ A diferencia de los registros tradicionales con múltiples formularios y vistas 
 ## **.PARA CORREGIR ANTES DE LA SUSTENTACION**
 
 - No se pueden eliminar adminsitrador  ** HECHO **
-- solo pueden ser tipo foto cuando se suba alguna foto si no que aprezca un error al momento de subir la foto.
+- solo pueden ser tipo foto cuando se suba alguna foto si no que aprezca un error al momento de subir la foto. **HECHO**
 - Tratar de que no se actualice constantemente la pagina.
 - El correo solo puede ser registrado tipo email , si se cambia a tipo texto no se puede registrar el usuario. ** HECHO **
 - organizar el buscador de los productos.
-- Tener lista de Usuarios para ese dia , uno por cada rol (Admin,cliente,barbero).
+- Tener lista de Usuarios para ese dia , uno por cada rol (Admin,cliente,barbero). **HECHO**

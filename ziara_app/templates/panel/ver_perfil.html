@@ -11,8 +11,8 @@
         <!-- Tarjeta principal del barbero -->
         <div class="col-12 col-md-8 col-lg-6 mx-auto">
             <div class="card shadow-lg border-0 bg-withe rounded-4 text-center p-4">
-                <img src="{{ request.session.logueado.foto }}" class="rounded-circle mx-auto mt-3 border border-3 border-primary" 
-                    alt="Foto de perfil" width="140" height="140">
+                <img src="{{ request.session.logueado.foto }}" class=" mx-auto mt-3 " 
+                    alt="Foto de perfil" width="250" height="250">
                 <div class="card-body">
                     {%if usuario.tipoUsuario == 'B'%}
                         {% with usuario.barberos.first as barbero %}

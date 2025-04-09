@@ -8,7 +8,7 @@
         <div class="col-md-3">
             <div class="card shadow-lg bg-primary text-white text-center">
                 <div class="card-body">
-                    <img src="{{request.session.logueado.foto}}" class="rounded-circle mb-3" width="80">
+                    <img src="{{request.session.logueado.foto}}" class="rounded-circle mb-3" width="200" height="200">
                     <h4 class="fw-bold"> {{barbero.usuario_barbero.nombre_completo}} </h4>
                     <p class="fst-italic"> {{barbero.especialidad}} </p>
                     <a href="{%url 'ver_perfil' request.session.logueado.id %}" class="btn btn-light btn-sm">Editar Perfil</a>

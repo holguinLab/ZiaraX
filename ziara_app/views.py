@@ -26,13 +26,40 @@ import re
 from django.core.mail import send_mail
 #endregion
 
+#region PROCESO DE IMAGENES
+def hacer_imagen_redonda(imagen, tamaño=(500, 500)):
+    """
+    Procesa la imagen para hacerla circular y del tamaño especificado.
+    Retorna un objeto de archivo listo para ser guardado en el modelo.
+    """
+    # Abrir la imagen
+    img = Image.open(imagen).convert("RGBA")
+    
+    # Redimensionar la imagen
+    img = img.resize(tamaño, Image.LANCZOS)
+
+    # Crear máscara circular
+    mascara = Image.new("L", tamaño, 0)
+    draw = ImageDraw.Draw(mascara)
+    draw.ellipse((0, 0, tamaño[0], tamaño[1]), fill=255)
+
+    # Aplicar la máscara
+    imagen_circular = Image.new("RGBA", tamaño, (0, 0, 0, 0))
+    imagen_circular.paste(img, (0, 0), mask=mascara)
+
+    # Guardar en memoria
+    buffer = io.BytesIO()
+    imagen_circular.save(buffer, format="PNG")
+    return ContentFile(buffer.getvalue())
+#endregion
+
 # Esta funcion solo muestra el index.html cuando se llama 
 def index(request):
     verificar = request.session.get('logueado',{})
     if verificar.get('rol') == 'B':
         return redirect('panel_barbero')
     servicios = Servicios.objects.all()
-    productos = Productos.objects.order_by('-id')[:5]
+    productos = Productos.objects.order_by('-id')[:3]
     barberos = Barberos.objects.all()
     carrito_id = request.session.get('carrito_servicios',[])
     carrito_producto_id = request.session.get('carrito_productos',[])
@@ -189,7 +216,7 @@ def registrar_citas(request):
             except Usuarios.DoesNotExist:
                 messages.warning(request,'❌ ERROR :No hay Datos Sobre Usuarios  Asociados')
             except Barberos.DoesNotExist:
-                messages.warning(request,'❌ ERROR :No hay Datos Sobre Barberos Asociados')
+                messages.info(request,'ℹ️ INFO : Por Favor Selecciona Un Barbero. ')
             except Servicios.DoesNotExist:
                 messages.warning(request,'❌ ERROR :No hay Datos Sobre Servicios Asociados')
             except Exception as e:
@@ -382,32 +409,7 @@ def panel_barbero(request):
     return redirect('index')
 #endregion
 
-#region PROCESO DE IMAGENES
-def hacer_imagen_redonda(imagen, tamaño=(250, 250)):
-    """
-    Procesa la imagen para hacerla circular y del tamaño especificado.
-    Retorna un objeto de archivo listo para ser guardado en el modelo.
-    """
-    # Abrir la imagen
-    img = Image.open(imagen).convert("RGBA")
-    
-    # Redimensionar la imagen
-    img = img.resize(tamaño, Image.LANCZOS)
 
-    # Crear máscara circular
-    mascara = Image.new("L", tamaño, 0)
-    draw = ImageDraw.Draw(mascara)
-    draw.ellipse((0, 0, tamaño[0], tamaño[1]), fill=255)
-
-    # Aplicar la máscara
-    imagen_circular = Image.new("RGBA", tamaño, (0, 0, 0, 0))
-    imagen_circular.paste(img, (0, 0), mask=mascara)
-
-    # Guardar en memoria
-    buffer = io.BytesIO()
-    imagen_circular.save(buffer, format="PNG")
-    return ContentFile(buffer.getvalue())
-#endregion
 
 #region ADMIN PANEL
 def admin_panel(request):
@@ -441,8 +443,9 @@ def eliminar_usuario(request,id_usuario):
         return redirect('index')
     try:
         usuario = Usuarios.objects.get(pk = id_usuario)
-        if usuario.tipoUsuario != 'A':
+        if usuario.tipoUsuario != 'A' and usuario.foto:
             usuario.delete()
+            usuario.foto.delete(save=False)
             messages.success(request,' ✅ MENSAJES : Usuario eliminado correctamente  ')
             return redirect('listar_usuarios')
         else:
@@ -795,8 +798,6 @@ def register(request):
                 nombre_completo = 'Explorador',
                 tipoUsuario = rol
                 )
-                
-                
                 q.save() # se guara el usuario que esta en la variable q en la BD si todo esta bien 
                 # SI se sube foto se procesa y se vuelve redonda y si no se sube predeterminada
                 if foto:
@@ -860,7 +861,7 @@ def register(request):
                 return redirect('listar_usuarios')
 
             except ValidationError :
-                messages.warning(request, '⚠️ WARNING : Escriba Un Correo Valido (@) ') # Si el correo no es tipo email muestra el mensaje
+                messages.warning(request, '⚠️ WARNING : Escriba Un Correo Con La Estructura Adecuada  .  joe_doe@example.com ') # Si el correo no es tipo email muestra el mensaje
             except IntegrityError :
                 messages.error(request, '❌ ERROR : El correo ya esta en uso ') # Si el correo ya existe mostrar esta excepcion 
             except Exception as error :
@@ -886,8 +887,7 @@ def register(request):
             foto = request.FILES.get('foto') # Estas opcion esta oculta en el html para todos los roles  pero la pongo para que se pueda procesar la foto decir si es se sube o no 
             password= request.POST.get('password') # Se optiene el password del html
             encriptada = hash_password(password) # se encripta la password del html 
-            email = request.POST.get('email'),
-            
+            email = request.POST.get('email')
             # Try para procesar el guardado de usuario en la BD
             try:
                 validate_email(email)
@@ -946,11 +946,11 @@ def register(request):
                 return redirect('login')
             
             except ValidationError :
-                messages.warning(request, ' ⚠️ WARNING : Escriba Un Correo Valido (@) ')
+                messages.warning(request, ' ⚠️ WARNING : Escriba Un Correo Con La Estructura Adecuada . joe_doe@example.com ')
             except IntegrityError :
-                messages.error(request, ' ❌ ERROR : El correo ya esta en uso ')
+                messages.info(request, ' ℹ️ INFO : Este Correo No Esta Disponible . ')
             except Exception as error :
-                messages.error(request, f" ❌ ERROR: No Se puede crear la cuenta : {error}")
+                messages.error(request, f" ❌ ERROR: No Se puede crear la cuenta : {error}rrr")
             return redirect('login')
         # si por alguna razon se pone la ruta register que es la que esta en url esta protegida para que aparezca el index
         else:
@@ -979,6 +979,7 @@ def ver_perfil(request,id_usuario):
         username = request.POST.get('username')
         tel = request.POST.get('tel')
         f_nacimiento = request.POST.get('f_nacimiento')
+        foto_subida = request.FILES.get('foto')
         try:
             if barbero:
                 barbero.especialidad = especialidad
@@ -989,28 +990,34 @@ def ver_perfil(request,id_usuario):
             usuario.username = username
             usuario.telefono = tel
             usuario.f_nacimiento = f_nacimiento
-            foto_subida = request.FILES.get('foto')
             if foto_subida:
-                #Se hace la foto redonda para evitar que suban fotos de cualquier tamaño
-                foto_procesada = hacer_imagen_redonda(foto_subida)
-                # Borrar la imagen anterior para evitar archivos basura
-                if usuario.foto:
-                    usuario.foto.delete(save=False)
+                try:
+                    validate_image_file_extension(foto_subida)
+                    #Se hace la foto redonda para evitar que suban fotos de cualquier tamaño
+                    foto_procesada = hacer_imagen_redonda(foto_subida)
+                    
+                    # Borrar la imagen anterior para evitar archivos basura
+                    if usuario.foto and usuario.foto.name:
+                        usuario.foto.delete(save=False)
 
-                # 🔵 Generar un nombre seguro para el archivo Este paso se puede omitir por nombre_archivo = f"{usuarioLogeado.id}.png" si no queremos usar las librerias
-                user_clean = re.sub(r'[^a-zA-Z0-9_-]', '_', usuario.username)  # Limpia caracteres especiales
-                nombre_archivo = f"{user_clean}_{uuid.uuid4().hex[:8]}.png"
-                usuario.foto.save(nombre_archivo, foto_procesada, save=True) # ! Esto sobrescribe la imagen que ya tiene guardada en media 
-            else:
+                    # 🔵 Generar un nombre seguro para el archivo Este paso se puede omitir por nombre_archivo = f"{usuarioLogeado.id}.png" si no queremos usar las librerias
+                    user_clean = re.sub(r'[^a-zA-Z0-9_-]', '_', usuario.username)  # Limpia caracteres especiales
+                    nombre_archivo = f"{user_clean}_{uuid.uuid4().hex[:8]}.png"
+                    usuario.foto.save(nombre_archivo, foto_procesada, save=True) # ! Esto sobrescribe la imagen que ya tiene guardada en media 
+                    usuario.save() # * Guarda los cambios en la BD
+                    messages.info(request,'ℹ️ INFO : Tu Informacion y Foto se ha actualizado correctamente. Por favor, inicia sesión nuevamente.')
+                    del request.session['logueado']
+                except ValidationError : 
+                    messages.warning(request,'⚠️ WARNING : Solo puedes subir imágenes en formato PNG , JPG Ó GIF')
+                    return redirect(request.META.get('HTTP_REFERER', 'index'))
+            else:   
                 usuario.save() # * Guarda los cambios en la BD
-            del request.session['logueado']
-            messages.info(request,'Tu información se ha actualizado. Por favor, inicia sesión nuevamente.')
+                messages.info(request,'ℹ️ INFO : Tu información se ha actualizado correctamente.')
+                return redirect(request.META.get('HTTP_REFERER', 'index'))
             return redirect('index')
-        except ValidationError : 
-            messages.error(request,'Solo Archivos png,jpg')
         except Exception as e:
             messages.error(request,f'{e}')
-        return redirect('index')
+        return redirect(request.META.get('HTTP_REFERER', 'index'))
     else:
         usuario = Usuarios.objects.get(pk = id_usuario)
         contexto ={

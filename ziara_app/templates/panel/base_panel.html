@@ -56,7 +56,36 @@
 
             <!-- Menú colapsable -->
             <div class="collapse navbar-collapse pt-0" id="navbarTogglerDemo01">
-
+                <ul class="navbar-nav ms-auto  mb-lg-0 gap-2 ">
+                    {%if request.session.logueado.rol == 'C' %}
+                        <li class="nav-item">
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'index'%}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'ver_tienda'%}">Tienda</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'ver_citas'%} ">Citas</a>
+                        </li>   
+                    {%endif%}
+                    
+                    {%if not request.session.logueado %}
+                        <li class="nav-item">
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'index'%}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'index' %}.#productos">Productos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'index' %}.#servicios">Servicios</a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page" href="{%url 'index' %}.#barberos ">Barberos</a>
+                        </li>   
+                    {%endif%}
+                </ul>
                 <ul class="navbar-nav ms-auto me-2 mb-lg-0 gap-2 ">
                     <!-- Dropdown de registro -->
                     <li class="nav-item dropdown">
