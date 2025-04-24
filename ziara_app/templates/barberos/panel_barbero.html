@@ -47,18 +47,23 @@
             
             <div class="tab-content mt-3" id="barberTabsContent">
                 <!-- Agenda Diaria -->
-                <div class="tab-pane fade show active" id="agenda" role="tabpanel">
+                <div class="tab-pane fade show active  " id="agenda" role="tabpanel">
                     <div class="card shadow-lg">
                         <div class="card-header bg-dark text-white fw-bold text-center">📅 Agenda Diaria</div>
-                        <div class="card-body">
-                            <ul class="list-group">
-                                {%for cita in cita_barbero%}
-                                
-                                <li class="list-group-item">{{cita.cliente.usuario_cliente.nombre_completo}} - {%for servicio in cita.citas.all%}  <span> {{servicio.servicio.nombre}}  ,</span> {%endfor%} </li>
-                                
-                                {%endfor%}
-                            </ul>
+                        {%for cita in cita_barbero%}
+                        <div class="card-body ">
+
+                            <div class="row d-flex align-items-center justify-content-around  gap-5 mb-3 mt-3  ">
+                                <div class="col-md-6 shadow-lg  ">
+                                    <li class="list-group-item "> <span class="text-success fw-bold">  Cliente </span>  :  {{cita.cliente.usuario_cliente.nombre_completo}} <br> <span class="text-success fw-bold" > Servicios : </span> {%for servicio in cita.citas.all%}  <span> {{servicio.servicio.nombre}}  ,</span> {%endfor%} <br> <span class="text-success fw-bold" > Fecha  :  </span> {{cita.fecha}}  <br> <span class="text-success fw-bold "> Hora :  </span> </li>
+                                </div>
+                                <div class="col-md-4 text-center ">
+                                    <button class=" btn btn-outline-primary fw-semibold    "> Enviar correo </button>
+                                </div>
+                            </div>
+
                         </div>
+                        {%endfor%}
                     </div>
                 </div>
 
