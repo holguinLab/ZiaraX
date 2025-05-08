@@ -77,5 +77,6 @@ urlpatterns=[
     path('verificacion_token_recuperar_password/',verificacion_token_recuperar_password,name='verificacion_token_recuperar_password'),
     path('ver_perfil/<int:id_usuario>/',ver_perfil,name='ver_perfil'),
     #endregion
-   
+    path('confirmar_reserva/',confirmar_reserva,name='confirmar_reserva'),
+    path('realizar_compra/',realizar_compra,name='realizar_compra')
 ]

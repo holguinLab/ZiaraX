@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.timezone import now
 from django.core.validators import validate_image_file_extension  # Importa el validador
+
 # Create your models here.
 
 class Usuarios(models.Model):
@@ -61,6 +62,7 @@ class Citas(models.Model):
     cliente = models.ForeignKey('Clientes',on_delete=models.CASCADE,related_name="cita_cliente") 
     barbero = models.ForeignKey('Barberos',on_delete=models.SET_NULL,null=True,related_name="cita_barbero") 
     fecha = models.DateField(default=now ,null=True,blank=True)
+    hora = models.TimeField(default=now)
     ESTADOS =(
         ("PEN","Pendiente"),
         ("PRO","Programada"),

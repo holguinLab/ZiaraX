@@ -1,56 +1,65 @@
 {%extends 'base.html'%}
 {%load static%}
-{%block titulo %}Home{%endblock%}
+{%block titulo %}HOME{%endblock%}
 
 {%block carrito%}
-
+<!-- Botón del carrito -->
 <button class="btn btn-transparent btn-sm dropdown-toggle" type="button" id="dropdownCarrito" data-bs-toggle="dropdown"
     aria-expanded="false" style="border: none;">
+    <i class="bi bi-cart3"></i>
     {% if suma > 0 %}
-    <i class="bi bi-cart3"></i> <span class="badge bg-danger" id="contadorCarrito"> {{suma}} </span>
-    {%endif%}
+    <span class="badge bg-danger" id="contadorCarrito">{{ suma }}</span>
+    {% endif %}
 </button>
 
-<ul class="dropdown-menu  dropdown-menu-end w-100 pb-0" aria-labelledby="dropdownCarrito" id="listaCarrito">
-    {% if carrito_servicios|length > 0 %}
-    {%for servicio in carrito_servicios%}
-    <li class="dropdown-item flex-wrap d-flex justify-content-between align-items-center">
-        <span class="text-wrap"> {{servicio.nombre}} </span>
-        <a href="{% url 'eliminar_elementos_carrito' servicio.id %}" class="btn btn-outline-danger btn-sm">
-            <i class="fas fa-trash-alt"></i> Eliminar
-        </a>
-        <p>{{servicio.precio}} $ </p>
-    </li>
-    {%endfor%}
-    {%endif%}
+<!-- Dropdown del carrito -->
+<ul class="dropdown-menu dropdown-menu-end w-100 pb-0" aria-labelledby="dropdownCarrito" id="listaCarrito" style="min-width: 300px;">
 
-    {% if carrito_productos|length > 0 %}
-    {%for producto in carrito_productos%}
-    <li class="dropdown-item flex-wrap  d-flex justify-content-between align-items-center">
-        <span class="text-wrap"> {{producto.nombre}} </span>
-        <a href="{% url 'eliminar_productos_carrito' producto.id %}" class="btn btn-outline-danger btn-sm">
-            <i class="fas fa-trash-alt"></i> Eliminar
-        </a>
-        <p>{{producto.precio}} $ </p>
-    </li>
-    {%endfor%}
-    {%endif%}
+    {% if carrito_servicios or carrito_productos %}
+    
+        {% for servicio in carrito_servicios %}
+        <li class="dropdown-item">
+            <div class="d-flex justify-content-between align-items-start flex-column flex-sm-row">
+                <div class="me-sm-2 flex-grow-1">
+                    <strong class="d-block text-truncate">{{ servicio.nombre }}</strong>
+                    <small class="text-muted">${{ servicio.precio }}</small>
+                </div>
+                <a href="{% url 'eliminar_elementos_carrito' servicio.id %}" class="btn btn-outline-danger btn-sm mt-2 mt-sm-0">
+                    <i class="fas fa-trash-alt"></i> Eliminar
+                </a>
+            </div>
+        </li>
+        {% endfor %}
 
-    <button class="btn btn-primary mx-auto d-block" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
-        Reservar y pagar
-    </button>
+        {% for producto in carrito_productos %}
+        <li class="dropdown-item">
+            <div class="d-flex justify-content-between align-items-start flex-column flex-sm-row">
+                <div class="me-sm-2 flex-grow-1">
+                    <strong class="d-block text-truncate text-wrap">{{ producto.nombre }}</strong>
+                    <small class="text-muted">${{ producto.precio }}</small>
+                </div>
+                <a href="{% url 'eliminar_productos_carrito' producto.id %}" class="btn btn-outline-danger btn-sm mt-2 mt-sm-0">
+                    <i class="fas fa-trash-alt"></i> Eliminar
+                </a>
+            </div>
+        </li>
+        {% endfor %}
+
+        <li class="dropdown-item text-center">
+            <a href="{% url 'confirmar_reserva' %}" class="btn btn-primary w-100 mt-2">Reservar y pagar</a>
+        </li>
+
+    {% else %}
+        <li class="dropdown-item text-center text-muted">
+            El carrito está vacío.
+        </li>
+    {% endif %}
 </ul>
+
 {%endblock%}
 
 
 {%block main %}
-
-
-
-
-
-
-
 <div class=" container-fluid d-flex  flex-column " style="color: #F2F2F2;">
     {%if request.session.logueado.rol == 'C' or not request.session.logueado %}
     <div class="row d-flex p-3 align-items-center ">
