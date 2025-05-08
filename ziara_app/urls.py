@@ -77,4 +77,5 @@ urlpatterns=[
     path('verificacion_token_recuperar_password/',verificacion_token_recuperar_password,name='verificacion_token_recuperar_password'),
     path('ver_perfil/<int:id_usuario>/',ver_perfil,name='ver_perfil'),
     #endregion
+   
 ]

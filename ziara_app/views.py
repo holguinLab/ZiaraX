@@ -63,8 +63,10 @@ def index(request):
     barberos = Barberos.objects.all()
     carrito_id = request.session.get('carrito_servicios',[])
     carrito_producto_id = request.session.get('carrito_productos',[])
+    
     carrito_servicios = Servicios.objects.filter(id__in = carrito_id) # Filter devuelve una lista 
     carrito_productos = Productos.objects.filter(id__in = carrito_producto_id)
+    
     suma = len(carrito_productos) + len(carrito_servicios)
     contexto = {
         'carrito_servicios' :carrito_servicios,
@@ -409,8 +411,6 @@ def panel_barbero(request):
     return redirect('index')
 #endregion
 
-
-
 #region ADMIN PANEL
 def admin_panel(request):
     verificar = request.session.get('logueado',False)
@@ -436,16 +436,16 @@ def listar_usuarios(request):
         }
         return render(request,'admin/usuarios/listar_usuarios.html',contexto)
 
-def eliminar_usuario(request,id_usuario):
+def eliminar_usuario(request,id_usuario): # Inactiva el usuario 
     verificar = request.session.get('logueado',False)
     if not verificar or verificar['rol'] != 'A':
         messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     try:
         usuario = Usuarios.objects.get(pk = id_usuario)
-        if usuario.tipoUsuario != 'A' and usuario.foto:
-            usuario.delete()
-            usuario.foto.delete(save=False)
+        if usuario.tipoUsuario != 'A' :
+            usuario.estado = 'Inactivo'
+            usuario.save()
             messages.success(request,' ✅ MENSAJES : Usuario eliminado correctamente  ')
             return redirect('listar_usuarios')
         else:
@@ -1141,7 +1141,5 @@ def ultimos_datos_admin(request):
     for cita in citas:
         notificaciones.append(f'{cita.cliente.usuario_cliente.nombre_completo} agendo una cita  ')
     return JsonResponse({'notificaciones':notificaciones})
-
-
-
 #endregion
+

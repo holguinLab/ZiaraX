@@ -6,38 +6,50 @@
 
 <button class="btn btn-transparent btn-sm dropdown-toggle" type="button" id="dropdownCarrito" data-bs-toggle="dropdown"
     aria-expanded="false" style="border: none;">
-    {% if suma > 0  %}
+    {% if suma > 0 %}
     <i class="bi bi-cart3"></i> <span class="badge bg-danger" id="contadorCarrito"> {{suma}} </span>
     {%endif%}
 </button>
 
-<ul class="dropdown-menu dropdown-menu-end w-100 pb-0" aria-labelledby="dropdownCarrito" id="listaCarrito">
+<ul class="dropdown-menu  dropdown-menu-end w-100 pb-0" aria-labelledby="dropdownCarrito" id="listaCarrito">
     {% if carrito_servicios|length > 0 %}
     {%for servicio in carrito_servicios%}
-    <li class="dropdown-item  d-flex justify-content-between align-items-center">
+    <li class="dropdown-item flex-wrap d-flex justify-content-between align-items-center">
         <span class="text-wrap"> {{servicio.nombre}} </span>
         <a href="{% url 'eliminar_elementos_carrito' servicio.id %}" class="btn btn-outline-danger btn-sm">
             <i class="fas fa-trash-alt"></i> Eliminar
         </a>
+        <p>{{servicio.precio}} $ </p>
     </li>
     {%endfor%}
     {%endif%}
 
     {% if carrito_productos|length > 0 %}
     {%for producto in carrito_productos%}
-    <li class="dropdown-item  d-flex justify-content-between align-items-center">
+    <li class="dropdown-item flex-wrap  d-flex justify-content-between align-items-center">
         <span class="text-wrap"> {{producto.nombre}} </span>
         <a href="{% url 'eliminar_productos_carrito' producto.id %}" class="btn btn-outline-danger btn-sm">
             <i class="fas fa-trash-alt"></i> Eliminar
         </a>
+        <p>{{producto.precio}} $ </p>
     </li>
     {%endfor%}
     {%endif%}
+
+    <button class="btn btn-primary mx-auto d-block" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
+        Reservar y pagar
+    </button>
 </ul>
 {%endblock%}
 
 
 {%block main %}
+
+
+
+
+
+
 
 <div class=" container-fluid d-flex  flex-column " style="color: #F2F2F2;">
     {%if request.session.logueado.rol == 'C' or not request.session.logueado %}
@@ -45,15 +57,18 @@
         <div class="col-6">
             <h1 class="display-1  fw-bold " style="color: #717171;">Eleva tu estilo con <span
                     style="color: #66BB69;">Ziara</span></h1>
-            <p class=" fs-5 fw-semibold" style="color: #263238;">Donde la precisión se encuentra con la pasión. Más que un corte, una experiencia.</p>
+            <p class=" fs-5 fw-semibold" style="color: #263238;">Donde la precisión se encuentra con la pasión. Más que
+                un corte, una experiencia.</p>
 
             <div class="d-flex gap-3">
                 <a href="{%url 'reservas_citas' %}">
-                    <button class="btn mt-5 shadow-lg  btn-lg fs-4  fw-semibold fs-6" style="color: #ffffff; background-color: #263238;">Reservar Cita </button>
+                    <button class="btn mt-5 shadow-lg  btn-lg fs-4  fw-semibold fs-6"
+                        style="color: #ffffff; background-color: #263238;">Reservar Cita </button>
                 </a>
-    
+
                 <a href="{%url 'ver_tienda' %}">
-                    <button class="btn mt-5 shadow-lg  btn-lg fs-4 btn-outline-secondary  fw-semibold fs-6" > Ver Tienda </button>
+                    <button class="btn mt-5 shadow-lg  btn-lg fs-4 btn-outline-secondary  fw-semibold fs-6"> Ver Tienda
+                    </button>
                 </a>
             </div>
         </div>
@@ -62,48 +77,51 @@
         </div>
     </div>
 
-    <div id="servicios" class="row  d-flex p-5 mb-0  justify-content-around mt-5 gap-5" style="background-color: #ffffff;">
+    <div id="servicios" class="row  d-flex p-5 mb-0  justify-content-around mt-5 gap-5"
+        style="background-color: #ffffff;">
         <h3 class="display-4  fw-bold text-center " style="color: #717171;">Nuestros <span style="color: #66BB69;"">Servicios</span></h3>
 
 
         {%for servicio in servicios%}
-        <div id="card" class="card shadow-lg p-0" style="width: 18rem;">
+        <div id=" card" class="card shadow-lg p-0" style="width: 18rem;">
                 <img id="img_{{servicio.id}}" class="card-img-top  " alt="Foto Servicio : {{servicio.nombre}}">
                 <div class="card-body text-center">
                     <h5 class="card-title">{{servicio.nombre}}</h5>
                     <p class="card-text">Desde {{servicio.precio}} $ </p>
                 </div>
-        </div>
-        {%endfor%}
-    </div> 
+    </div>
+    {%endfor%}
+</div>
 
-    <div id="productos" class="row  d-flex p-5  justify-content-around  gap-5" style="background-color: #ffffff;">
-        <h3 class="display-4 mb-5 fw-bold text-center " style="color: #717171;">Productos <span style="color: #66BB69;"">Destacados</span></h3>
+<div id="productos" class="row  d-flex p-5  justify-content-around  gap-5" style="background-color: #ffffff;">
+    <h3 class="display-4 mb-5 fw-bold text-center " style="color: #717171;">Productos <span style="color: #66BB69;"">Destacados</span></h3>
 
         {%for producto in productos%}
-        <div id="card" class="card shadow-lg p-0 mt-5" style="width: 18rem;">
-                <img id="img_{{producto.id}}" class="card-img-top  " alt="Foto Servicio : {{producto.nombre}}">
-                <div class="card-body text-center">
-                    <h5 class="card-title">{{producto.nombre}}</h5>
-                    <p class="card-text">Desde {{producto.precio}} $ </p>
-                </div>
-        </div>
-        {%endfor%}
-    </div> 
+        <div id=" card" class="card shadow-lg p-0 mt-5" style="width: 18rem;">
+            <img id="img_{{producto.id}}" class="card-img-top  " alt="Foto Servicio : {{producto.nombre}}">
+            <div class="card-body text-center">
+                <h5 class="card-title">{{producto.nombre}}</h5>
+                <p class="card-text">Desde {{producto.precio}} $ </p>
+            </div>
+</div>
+{%endfor%}
+</div>
 
-    <div id="barberos" class="row  d-flex p-5  justify-content-around  gap-5" >
-        <h3 class="display-4 mb-5 fw-bold text-center " style="color: #717171;">Nuestros <span style="color: #66BB69;"">Barberos</span></h3>
+<div id="barberos" class="row  d-flex p-5  justify-content-around  gap-5">
+    <h3 class="display-4 mb-5 fw-bold text-center " style="color: #717171;">Nuestros <span style="color: #66BB69;"">Barberos</span></h3>
         {% for barbero in barberos %}
-        <div class="card  rounded-4 p-5 mt-5" style="width: 350px;">
-            <img src="{{ barbero.usuario_barbero.foto.url }}" class="card-img-top  mx-auto" alt="foto barbero" style="max-width: 200px; object-fit: contain;">
+        <div class=" card rounded-4 p-5 mt-5" style="width: 350px;">
+            <img src="{{ barbero.usuario_barbero.foto.url }}" class="card-img-top  mx-auto" alt="foto barbero"
+                style="max-width: 200px; object-fit: contain;">
             <div class="d-flex flex-column gap-5">
                 <h6 class="mt-2 text-center fw-bold fs-5 card-title ">{{ barbero.usuario_barbero.nombre_completo }}</h6>
-                <p class="card-text text-center"> <span class="fw-bold">Especialidad :</span> {{barbero.especialidad}}  </p>
+                <p class="card-text text-center"> <span class="fw-bold">Especialidad :</span> {{barbero.especialidad}}
+                </p>
             </div>
-        </div>
-        {% endfor %}
-    </div>
-    {%endif%}
+</div>
+{% endfor %}
+</div>
+{%endif%}
 </div>
 
 

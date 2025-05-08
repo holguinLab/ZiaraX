@@ -4,6 +4,7 @@ from django.core.validators import validate_image_file_extension  # Importa el v
 # Create your models here.
 
 class Usuarios(models.Model):
+    estado=models.CharField(max_length=15,default='Activo')
     email = models.CharField(max_length=100,unique=True,null=False,blank=False)
     password = models.CharField(max_length=128,blank=False,null=False)
     nombre_completo = models.CharField(max_length=254 ,null=True,blank=True)
@@ -12,7 +13,7 @@ class Usuarios(models.Model):
     foto = models.ImageField(upload_to="fotos/",blank=True,null=True,default='fotos/predeterminado.png',validators=[validate_image_file_extension])
     username = models.CharField(max_length=10 , blank=True, null=True,default='')
     ROLES = (
-        ("A","Admin"),
+        ("A","Admin"), 
         ("B","Barbero"),
         ("C","Cliente"),
     )
