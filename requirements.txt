@@ -1,2 +1,2 @@
-pillow
-django
+Django>=4.0,<5.0
+Pillow>=8.0,<10.0
