@@ -60,11 +60,12 @@
     <!-- Buscador + Botón de Música -->
     <div class="row justify-content-center mb-4">
         <div class="col-md-8">
-            <div class="input-group shadow-sm">
-                <input type="text" class="form-control border-success" placeholder="🔍 Busca tu producto favorito...">
-                <button class="btn btn-success">Buscar</button>
-
-            </div>
+            <form method="GET" action="{% url 'ver_tienda' %}">
+                <div class=" input-group shadow-sm">
+                    <input  type="text" name="buscar" class="search-input form-control border-success" placeholder="🔍 Busca tu producto favorito...">
+                    <button type="submit" class="btn btn-success">Buscar</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -72,16 +73,17 @@
     <!-- Filtros -->
     <div class="row mb-4">
         <div class="col text-center">
-            <button class="btn btn-outline-success shadow-sm fw-bold px-3 m-1">🌿 Todos</button>
-            <button class="btn btn-outline-success shadow-sm fw-bold px-3 m-1">💆‍♂️ Cabello</button>
-            <button class="btn btn-outline-success shadow-sm fw-bold px-3 m-1">🧴 Rostro</button>
-            <button class="btn btn-outline-success shadow-sm fw-bold px-3 m-1">🛀 Cuerpo</button>
-            <button class="btn btn-outline-success shadow-sm fw-bold px-3 m-1">🌿 Natural</button>
+            <a href="{% url 'ver_tienda' %}?categoria=B" class="btn btn-outline-success shadow-sm fw-bold px-3 m-1">🧔 Barba</a>
+            <a href="{% url 'ver_tienda' %}?categoria=C" class="btn btn-outline-success shadow-sm fw-bold px-3 m-1">💆‍♂️ Cabello</a>
+            <a href="{% url 'ver_tienda' %}?categoria=R" class="btn btn-outline-success shadow-sm fw-bold px-3 m-1">🧴 Rostro</a>
+            <a href="{% url 'ver_tienda' %}?categoria=P" class="btn btn-outline-success shadow-sm fw-bold px-3 m-1">🛀 Cuerpo</a>
+            <a href="{% url 'ver_tienda' %}?categoria=N" class="btn btn-outline-success shadow-sm fw-bold px-3 m-1">🌿 Natural</a>
         </div>
     </div>
 
     <!-- Lista de Productos -->
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {%if productos%}
         <!-- Producto -->
         {% for producto in productos %}
         <div class="col">
@@ -115,6 +117,11 @@
             </div>
         </div>
         {%endfor%}
+        {%else%}
+            <div id="mensaje-vacio" class="text-center mx-auto fw-bold text-danger my-4" >
+                ❌ No se encontraron coincidencias
+            </div>       
+        {%endif%}
     </div>
 
     <style>
@@ -136,4 +143,14 @@
 
 {%block js%}
 <script src="{%static 'js/index_productos.js'%}"></script>
+<script>
+    document.querySelector('.search-input').addEventListener('input', function() {
+    const query = this.value;
+    fetch(`/tienda/?q=${query}`)
+        .then(response => response.text())
+        .then(data => {
+            document.querySelector('.products-list').innerHTML = data;
+        });
+});
+</script>
 {%endblock%}

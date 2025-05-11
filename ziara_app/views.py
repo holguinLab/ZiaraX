@@ -304,6 +304,18 @@ def ver_tienda(request):
     if not verificar or verificar['rol'] == 'C' :
         ultimos_productos = Productos.objects.order_by('-id')[:3]
         productos = Productos.objects.all()
+        
+        # Obtener parámetros de búsqueda y categoría
+        buscar = request.GET.get('buscar')
+        categoria = request.GET.get('categoria')
+
+        if buscar:
+            productos = productos.filter(nombre__icontains=buscar)
+
+        if categoria:
+            productos = productos.filter(categoria=categoria)
+        
+        
         carrito_id = request.session.get('carrito_servicios',[])
         carrito_producto_id = request.session.get('carrito_productos',[])
         carrito_servicios = Servicios.objects.filter(id__in = carrito_id) # Filter devuelve una lista 
