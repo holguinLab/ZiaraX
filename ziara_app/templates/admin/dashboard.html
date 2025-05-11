@@ -23,10 +23,24 @@
                 </div>
                 <div class="card-body">
                     <ul class="list-group">
-                        <li class="list-group-item">Juan Pérez agendó una cita</li>
-                        <li class="list-group-item">Se completó el servicio de Corte + Barba</li>
-                        <li class="list-group-item">María López canceló su cita</li>
-                        <li class="list-group-item">Carlos Gómez se registró en el sistema</li>
+                        {%for cita in citas%}
+                        <li class="list-group-item">{{cita.cliente.usuario_cliente.nombre_completo}} agendo una cita</li>
+                        {%endfor%}
+                        {%for servicio in servicios%}
+                        <li class="list-group-item">Se agrego el servicio <span class="fw-bold text-success">{{servicio.nombre}}</span> </li>
+                        {%endfor%}
+                        {%for producto in productos%}
+                        <li class="list-group-item">Se agrego el producto <span class="fw-bold text-success">{{producto.nombre}}</span> </li>
+                        {%endfor%}
+                        {%for pago in pagos%}
+                        <li class="list-group-item"> <span class="fw-bold text-success">{{pago.cliente.usuario_cliente.nombre_completo}}</span> realizo un pago  </li>
+                        {%endfor%}
+                        {%for barbero in barberos%}
+                            <li class="list-group-item"> <span class="fw-bold text-success">{{barbero.admin_creador.usuario_admin.nombre_completo}}</span> Registro una Cuenta De Barbero  </li>
+                        {%endfor%}
+                        {%for admin in admins%}
+                            <li class="list-group-item"> <span class="fw-bold text-success">{{admin.usuario_admin.nombre_completo}}</span> Registro una Cuenta Tipo Admin  </li>
+                        {%endfor%}
                     </ul>
                 </div>
             </div>
@@ -35,26 +49,31 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Empleados Activos</h5>
+                    <h5 class="mb-0">Empleados</h5>
                 </div>
                 <div class="card-body">
                     <ul class="list-group">
+                        {%if barberos or admins%}
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>🔹 <strong>Pedro Ramírez</strong></span>
-                            <span class="badge bg-success">Disponible</span>
+                            {%for barbero in barberos%}
+                            
+                            <span>🔹 <strong> {{barbero.usuario_barbero.nombre_completo}} </strong></span>
+                            <span class="badge bg-success">{{barbero.usuario_barbero.get_tipoUsuario_display}}</span>
+                            
+                            {%endfor%}
+
                         </li>
+                        
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>🔹 <strong>Laura Gómez</strong></span>
-                            <span class="badge bg-danger">Ocupado</span>
+                            {%for admin in admins%}
+                            
+                            <span>🔹 <strong> {{admin.usuario_admin.nombre_completo}} </strong></span>
+                            <span class="badge bg-success">{{admin.usuario_admin.get_tipoUsuario_display}}</span>
+                            
+                            {%endfor%}
+
                         </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>🔹 <strong>Carlos Méndez</strong></span>
-                            <span class="badge bg-warning">En Descanso</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>🔹 <strong>Ana Rodríguez</strong></span>
-                            <span class="badge bg-success">Disponible</span>
-                        </li>
+                        {%endif%}
                     </ul>
                 </div>
             </div>

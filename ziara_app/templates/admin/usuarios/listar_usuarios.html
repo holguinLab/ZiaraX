@@ -29,10 +29,10 @@
                 <input type="file" class="form-control" name="foto" id="foto">
             </div>
 
-            <div class="col-md-8 mb-3   ">
+            <div class="col-md-8 mb-3   " >
                 <label class="form-label text-black" for="rol">Rol</label>
-                <select class="form-select "  name="rol" id="rol" >
-                    <option selected>Seleccione ..</option >
+                <select class="form-select "  name="rol" id="rol" required  >
+                    <option   value="" selected disabled >Seleccione ..</option >
                     {%for rol , etiqueta in roles%}
                     {%if not rol == 'C'%}
                     <option value="{{rol}}">{{etiqueta}}</option >

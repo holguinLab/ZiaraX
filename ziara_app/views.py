@@ -59,6 +59,8 @@ def index(request):
     verificar = request.session.get('logueado',{})
     if verificar.get('rol') == 'B':
         return redirect('panel_barbero')
+    elif verificar.get('rol') == 'A':
+        return redirect('admin_panel')
     servicios = Servicios.objects.all()
     productos = Productos.objects.order_by('-id')[:3]
     ultimos_servicios= Servicios.objects.order_by('-id')[:3]
@@ -479,7 +481,22 @@ def dashboard(request):
     if not verificar or  verificar['rol'] != 'A':
         messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
-    return render(request,'admin/dashboard.html')
+    citas=Citas.objects.order_by('-id')[:1]
+    barberos=Barberos.objects.order_by('-id')[:1]
+    admin=Administradores.objects.order_by('-id')[:1]
+    servicios=Servicios.objects.order_by('-id')[:1]
+    productos=Productos.objects.order_by('-id')[:1]
+    pagos=Pagos.objects.order_by('-id')[:1]
+    contexto = {
+        'citas ': citas,
+        'barberos' :barberos,
+        'servicios':servicios,
+        'productos':productos,
+        'pagos':pagos,
+        'admins':admin
+    }
+    
+    return render(request,'admin/dashboard.html',contexto)
 
 #region USUARIOS
 def listar_usuarios(request):
@@ -506,8 +523,8 @@ def eliminar_usuario(request,id_usuario): # Inactiva el usuario
     try:
         usuario = Usuarios.objects.get(pk = id_usuario)
         if usuario.tipoUsuario != 'A' :
-            usuario.estado = 'Inactivo'
-            usuario.save()
+            usuario.foto.delete()
+            usuario.delete()
             messages.success(request,' ✅ MENSAJES : Usuario eliminado correctamente  ')
             return redirect('listar_usuarios')
         else:
@@ -862,7 +879,9 @@ def register(request):
             password= request.POST.get('password') # Se optiene el password del html
             encriptada = hash_password(password) # se encripta la password del html 
             email = request.POST.get('email')
-            
+            if not rol:
+                messages.warning(request,' ⚠️ WARNING : Debes Seleccionar Un Rol ')
+                return redirect('listar_usuarios')
             # Try para procesar el guardado de usuario en la BD
             try:
                 validate_email(email) # Valida que el correo sea tipo email antes de validar
@@ -873,6 +892,7 @@ def register(request):
                 nombre_completo = 'Explorador',
                 tipoUsuario = rol
                 )
+                
                 q.save() # se guara el usuario que esta en la variable q en la BD si todo esta bien 
                 # SI se sube foto se procesa y se vuelve redonda y si no se sube predeterminada
                 if foto:
@@ -1158,7 +1178,7 @@ def recueperar_password(request):
 #Verificacion de token 
 def verificacion_token_recuperar_password(request):
     verificar = request.session.get('logueado',False)
-    if verificar:
+    if not verificar:
         messages.error(request,'Permiso Denegado')
         return redirect('index')
     if request.method == 'POST':
@@ -1174,7 +1194,7 @@ def verificacion_token_recuperar_password(request):
                     q.password = hash_password(password)
                     q.save()
                     messages.success(request, "Contraseña recuperada correctamente!")
-                    return redirect("login")
+                    return redirect("index")
                 else:
                     messages.warning(request,'Las contraseñas no conciden')
             else:
