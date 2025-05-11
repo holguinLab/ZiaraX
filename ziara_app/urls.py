@@ -14,7 +14,7 @@ urlpatterns=[
     
     #region PANEL ADMIN 
     path('admin_panel/',admin_panel,name='admin_panel'),
-    path('dashboard/',dashboard,name='dashboard'),
+    
     
     
     # USUARIOS 

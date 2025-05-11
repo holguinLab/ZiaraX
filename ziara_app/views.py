@@ -411,7 +411,7 @@ def panel_barbero(request):
         usuario = Usuarios.objects.get(pk = verificar['id'])
         barbero = usuario.barberos.first()
         cita_barbero = barbero.cita_barbero.all()
-        
+
 
         contexto={
             'barbero':barbero,
@@ -468,15 +468,9 @@ def enviar_correo(request):
 
 #region ADMIN PANEL
 #incio
-def admin_panel(request):
-    verificar = request.session.get('logueado',False)
-    if not verificar or  verificar['rol'] != 'A':
-        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
-        return redirect('index')
-    return render(request,'admin/inicio.html')
 
 #
-def dashboard(request):
+def admin_panel(request):
     verificar = request.session.get('logueado',False)
     if not verificar or  verificar['rol'] != 'A':
         messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
@@ -636,9 +630,21 @@ def detalles_barberos(request,id_barbero):
                 messages.success(request,f'Se Asigno El Horario Correctamente a {barbero.usuario_barbero.nombre_completo}')
                 barbero.save()
                 return redirect('detalles_barberos',id_barbero=id_barbero)
+            cita_barberos = Citas.objects.filter(barbero=id_barbero)
+            contador={}
+            for cita in cita_barberos:
+                cliente = cita.cliente
+                if cliente in contador:
+                    contador[cliente] += 1
+                else:
+                    contador[cliente] =1
+            clientes_recurrentes = [cliente for cliente, cantidad in contador.items() if cantidad > 1]
+
             contexto = {
                 'barbero' : barbero,
-                'dias' :dias
+                'dias' :dias,
+                'cita_barberos' : cita_barberos,
+                'clientes_recurrentes' :clientes_recurrentes,
             }
             return render(request,'admin/usuarios/detalles_barberos.html',contexto)
         except Exception as e:
