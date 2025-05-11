@@ -29,18 +29,13 @@
                     </div>
                     <p class="card-text"><strong>Fecha:</strong> {{cita.fecha }}  </p>
                     <p class="card-text"><strong>Hora:</strong> {{cita.hora }}  </p>
-                    <p class="card-text"><strong>Estado:</strong> {{cita.get_estado_display}}</p>
-                    
+
                     <h6>Servicios:</h6>
                     <ul class="list-unstyled">
                         {%for servicio in cita.citas.all%}
                         <li>✅ {{servicio.servicio.nombre}} - <span class="small text-muted"> {{servicio.servicio.duracion}} </span></li>
                         {%endfor%}
                     </ul>
-                    <a href="{%url 'cancelar_citas' cita.id%}" class="btn btn-danger btn-sm">Cancelar</a>
-                    {%if cita.get_estado_display == 'Pendiente'%}
-                        <a href="{%url 'confirmar_citas' cita.id%}" class="btn btn-info btn-sm">Confirmar</a>
-                    {%endif%}
                 </div>
             </div>
             

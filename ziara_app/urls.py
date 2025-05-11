@@ -14,6 +14,8 @@ urlpatterns=[
     
     #region PANEL ADMIN 
     path('admin_panel/',admin_panel,name='admin_panel'),
+    path('dashboard/',dashboard,name='dashboard'),
+    
     
     # USUARIOS 
     path('listar_usuarios/',listar_usuarios,name='listar_usuarios'),
@@ -67,7 +69,11 @@ urlpatterns=[
     #endregion
     
     #region BARBEROS
-    path('panel_barbero',panel_barbero,name='panel_barbero'),
+    path('panel_barbero/',panel_barbero,name='panel_barbero'),
+    path('enviar_correo_html/<int:id_cliente>/',enviar_correo_html,name='enviar_correo_html'),
+    path('enviar_correo/',enviar_correo,name='enviar_correo'),
+    
+    
     
     #endregion
     
@@ -78,5 +84,7 @@ urlpatterns=[
     path('ver_perfil/<int:id_usuario>/',ver_perfil,name='ver_perfil'),
     #endregion
     path('confirmar_reserva/',confirmar_reserva,name='confirmar_reserva'),
-    path('realizar_compra/',realizar_compra,name='realizar_compra')
+    path('realizar_compra/',realizar_compra,name='realizar_compra'),
+    path('historial_pagos/',historial_pagos,name='historial_pagos'),
+    
 ]

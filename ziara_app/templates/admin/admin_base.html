@@ -122,15 +122,15 @@
         </div>
         <div class="offcanvas-body bg-dark text-white">
             <nav class="nav flex-column">
-                <a class="nav-link text-light" href="{%url 'admin_panel'%}"><i class="bi bi-grid"></i> Dashboard</a>
                 <a class="nav-link text-light" href="{%url 'admin_panel'%}"><i class="bi bi-house-door"></i> Inicio</a>
+                <a class="nav-link text-light" href="{%url 'dashboard'%}"><i class="bi bi-grid"></i> Dashboard</a>
                 <a class="nav-link text-light" href="{%url 'listar_usuarios'%}"><i class="bi bi-person-badge"></i> Usuarios</a>
                 <a class="nav-link text-light" href="{%url 'listar_citas'%}"><i class="bi bi-calendar-check"></i> Citas</a>
                 <a class="nav-link text-light" href="{%url 'listar_servicios'%}"><i class="bi bi-scissors"></i> Servicios</a>
                 <a class="nav-link text-light" href="{%url 'listar_productos'%}"><i class="bi bi-box-seam-fill"></i> Productos</a>
                 <a class="nav-link text-light" href="{% url 'inventario' %}"><i class="bi bi-archive-fill"></i> Inventario</a>
                 <hr>
-                <a class="nav-link text-light" href="#"><i class="bi bi-gear"></i> Configuración</a>
+                
                 <a class="nav-link text-light" href="{%url 'ver_perfil' request.session.logueado.id%}"><i class="bi bi-person-lines-fill"></i> Editar Perfil</a>
                 <a class="nav-link text-light" href="{%url 'recuperar_password'%}"><i class="bi bi-lock-fill"></i> Cambiar Contraseña</a>
                 <hr class="text-light">
@@ -144,14 +144,13 @@
     <div class="d-flex flex-grow-1  shadow-lg">
         <!-- Sidebar fijo en pantallas grandes -->
         <nav class="sidebar rounded-4 m-3 d-none d-lg-block">
-            <a href="{%url 'admin_panel'%}"><i class="bi bi-grid"></i> Dashboard</a>
             <a href="{%url 'admin_panel'%}"><i class="bi bi-house-door"></i> Inicio</a>
+            <a href="{%url 'dashboard'%}"><i class="bi bi-grid"></i> Dashboard</a>
             <a href="{%url 'listar_usuarios'%}"><i class="bi bi-person-badge"></i> Usuarios</a>
             <a href="{%url 'listar_citas'%}"><i class="bi bi-calendar-check"></i> Citas</a>
             <a href="{%url 'listar_servicios'%}"><i class="bi bi-scissors"></i> Servicios</a>
             <a href="{%url 'listar_productos'%}"><i class="bi bi-box-seam"></i> Productos</a>
             <a href="{% url 'inventario' %}"><i class="bi bi-archive"></i> Inventario</a>
-            <a href="#"><i class="bi bi-gear"></i> Configuración</a>
             <hr>
             <a href="{% url 'logout' %}" style="color: #E53835;"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </nav>

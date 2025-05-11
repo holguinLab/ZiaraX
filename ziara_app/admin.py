@@ -32,3 +32,12 @@ class adminCitaServicios(admin.ModelAdmin):
 class adminClientes(admin.ModelAdmin):
     list_display=['id','usuario_cliente']
     list_editable=['usuario_cliente']
+
+
+@admin.register(Pagos)
+class adminPagos(admin.ModelAdmin):
+    list_display=['id','cliente','cita','fecha_pago']
+    
+@admin.register(ProductosComprados)
+class adminProductosComprados(admin.ModelAdmin):
+    list_display=['id','pago','producto',]

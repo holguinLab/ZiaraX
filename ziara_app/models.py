@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
+from datetime import time
 from django.core.validators import validate_image_file_extension  # Importa el validador
 
 # Create your models here.
@@ -30,7 +31,13 @@ class Administradores(models.Model):
 class Barberos(models.Model):
     usuario_barbero = models.ForeignKey('Usuarios',on_delete=models.CASCADE,related_name="barberos") 
     admin_creador = models.ForeignKey('Usuarios',on_delete=models.SET_NULL,null=True,related_name="barberos_creados") #Django podría lanzar advertencias si tienes múltiples ForeignKeys apuntando a Usuarios. related name ayuda para eso
-    horario_trabajo = models.TextField(null=True,blank=True)
+    DIAS = (
+        ('semana','Lunes a Jueves'),
+        ('fin_semana','Viernes a Domingo')
+    )
+    horario_trabajo = models.CharField(max_length=100,choices=DIAS,default='')
+    hora_inicio = models.TimeField(default=time(9, 0))
+    hora_final = models.TimeField(default=time(16, 0))
     experiencia = models.IntegerField(null=True,blank=True,default=0)
     especialidad = models.CharField(max_length=200,null=True,blank=True)
     
@@ -99,3 +106,16 @@ class Inventarios(models.Model):
 class CitaServicios(models.Model):
     cita = models.ForeignKey('Citas',on_delete=models.CASCADE,related_name="citas")
     servicio = models.ForeignKey('Servicios', on_delete=models.SET_NULL, null=True, blank=True, related_name="cita_servicio")
+
+
+class Pagos(models.Model):
+    cliente = models.ForeignKey('Clientes', on_delete=models.CASCADE, related_name="pagos")
+    cita = models.ForeignKey('Citas', on_delete=models.SET_NULL, null=True, blank=True, related_name="pagos_cita")
+    fecha_pago = models.DateTimeField(default=now)
+    monto_total = models.DecimalField(max_digits=12, decimal_places=2)
+
+
+
+class ProductosComprados(models.Model):
+    pago = models.ForeignKey('Pagos', on_delete=models.CASCADE, related_name='productos_comprados')
+    producto = models.ForeignKey('Productos', on_delete=models.CASCADE)

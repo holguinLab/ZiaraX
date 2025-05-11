@@ -8,80 +8,59 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
 <style>
-.sidebar a {
-    color: #263238;
-    padding: 10px 15px;
-    text-decoration: none;
-}
+    .sidebar a {
+        color: #263238;
+        padding: 10px 15px;
+        text-decoration: none;
+    }
 </style>
 {%endblock%}
 
 
 
 {%block main%}
-<form class="" action="{% url 'registrar_citas' %} " method="post">
-    <input id="fechaSeleccionada" type="date" name="fecha" style="display: none;">
-    {% csrf_token %}
-    <div class="mb-3" >
-        <div class="row m-0 mt-3">
-            <!-- Calendario -->
-            <div class="col-md-6" id="calendar"></div>
-            
-            <div class="col-md-6 ">
-                <div class="d-flex flex-column align-items-center">
-                {%if request.session.carrito_servicios%}
-                <button class="btn btn-success btn-lg d-flex align-items-center gap-2 m-3 px-4" style="transition: all 0.2s ease;">
-                    <i class="bi bi-calendar-plus fs-4"></i>
-                    <span class="fw-bold">Agendar Ahora</span>
-                </button>
-                {%else%}
-                    <h5 class="text-center fs-4">Selecciona un Servicio: </h5>
-                {%endif%}
-                </div>
-                
-                
-                <div class="d-flex justify-content-center gap-3 mt-3" style="flex-wrap: wrap;">
-                    
-                    {% for servicio in servicios %}
-                    <div class="card shadow-lg rounded-4" style="width: 230px;">
-                        <div class="card-body d-flex flex-column gap-2">
-                            <h5 class="card-title fw-bold text-center mb-3">{{ servicio.nombre }} </h5>
-                            <h6 class="card-subtitle small me-auto mb-2 text-muted">{{ servicio.precio }} $</h6>
-                            <p class="card-text text-center"> {{servicio.descripcion}} </p>
-                            <div class="d-flex flex-column gap-3">
-                                {%if request.session.logueado.rol == 'C' %}
-                                <a href="{% url 'agregar_servicio_carrito' servicio.id %}" class="btn btn-outline-success">
-                                    <i class="bi bi-cart-plus"></i> Agregar
-                                </a>
-                                {%else%}
-                                    <p class="text-danger fw-bold text-center">🔑 Regístrate o inicia sesión para reservar</p>
-                                {%endif%}
-                                <span class=" ms-auto bg-secondary badge rounded-2 p-1 text-withe fw-bold "> {{servicio.duracion}} </span>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                <div class="mt-5">
-                    <h5 class="text-center fs-4">Selecciona un Barbero : </h5>
-                    <div class="d-flex justify-content-around gap-2 " style="flex-wrap: wrap;">
-                        {% for barbero in barberos %}
-                        <div class="card col-md-6 rounded-4 p-2 text-center" style="width: 200px;">
-                            <img src="{{ barbero.usuario_barbero.foto.url }}" style="height: 150px; width: 150px;"
-                                class="card-img-top rounded-circle mx-auto d-block" alt="foto barbero">
-                            <h6 class="mt-2">{{ barbero.usuario_barbero.nombre_completo }}</h6>
-                            <input type="radio" name="barbero" value="{{ barbero.id }}" class="form-check-input">
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                
-            </div>
-            
-        </div>
-        
+<div class="container my-4">
+    <div class="text-center mb-4">
+        {% if request.session.carrito_servicios %}
+        <a href="{% url 'confirmar_reserva' %}"
+            class="btn btn-success btn-lg px-4 mx-auto d-flex align-items-center justify-content-center gap-2"
+            style="max-width: 300px;">
+            <i class="bi bi-calendar-plus fs-4"></i>
+            <span class="fw-bold">Agendar Ahora</span>
+        </a>
+        {% else %}
+        <h4 class="fw-semibold">Selecciona un Servicio:</h4>
+        {% endif %}
     </div>
-</form>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for servicio in servicios %}
+        <div class="col">
+            <div class="card h-100 shadow rounded-4">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="card-title fw-bold text-center">{{ servicio.nombre }}</h5>
+                        <h6 class="text-muted text-center mb-2">{{ servicio.precio }} $</h6>
+                        <p class="card-text text-center">{{ servicio.descripcion }}</p>
+                    </div>
+                    <div class="mt-3 d-flex flex-column gap-2">
+                        {% if request.session.logueado.rol == 'C' %}
+                        <a href="{% url 'agregar_servicio_carrito' servicio.id %}" class="btn btn-outline-success">
+                            <i class="bi bi-cart-plus"></i> Agregar
+                        </a>
+                        {% else %}
+                        <p class="text-danger fw-bold text-center mb-0">🔑 Regístrate o inicia sesión para reservar</p>
+                        {% endif %}
+                        <span class="ms-auto badge bg-secondary p-2 rounded-pill">
+                            {{ servicio.duracion }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 
 <!-- Mapa al final -->
 <div class="row m-0">
@@ -95,29 +74,6 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        setTimeout(function () { // Retraso para asegurar que el DOM está listo
-            let calendarEl = document.getElementById('calendar');
-            if (!calendarEl) {
-                console.error("No se encontró el elemento #calendar");
-                return;
-            }
-
-            let calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                selectable: true,
-                height: 'auto', // Ajusta la altura automáticamente
-                dateClick: function (info) {
-                    document.getElementById('fechaSeleccionada').value = info.dateStr; // AGREGA FECHA SELECCIONADA AL INPUT
-                    alert('Has seleccionado: ' + info.dateStr);
-                }
-            });
-
-            calendar.render();
-        }, 500); // Espera 500ms para asegurar carga del DOM y vuelve y repite 
-    });
-
-
 
     document.addEventListener("DOMContentLoaded", function () {
         // Crear el mapa y centrarlo en una ubicación (Lat, Lng)

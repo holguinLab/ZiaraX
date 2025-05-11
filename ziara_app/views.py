@@ -61,6 +61,7 @@ def index(request):
         return redirect('panel_barbero')
     servicios = Servicios.objects.all()
     productos = Productos.objects.order_by('-id')[:3]
+    ultimos_servicios= Servicios.objects.order_by('-id')[:3]
     barberos = Barberos.objects.all()
     carrito_id = request.session.get('carrito_servicios',[])
     carrito_producto_id = request.session.get('carrito_productos',[])
@@ -76,6 +77,7 @@ def index(request):
         'servicios':servicios,
         'productos':productos,
         'barberos':barberos,
+        'ultimos_servicios' : ultimos_servicios,
     }
     return render(request,'index.html',contexto)
 
@@ -144,7 +146,7 @@ def agregar_servicio_carrito(request,servicio_id): # servicio_id que viene del h
             carrito.append(servicio_id)
         
         request.session["carrito_servicios"] = carrito  # Guardar en sesión
-        return redirect('reservas_citas')
+        return redirect(request.META.get('HTTP_REFERER', 'index'))
     #Exepcion si el id ingresado en l html no se encuentra en el id del modelo 
     except Servicios.DoesNotExist:
         messages.info(request,'❌ ERROR : No Hay Datos Asociados')
@@ -346,7 +348,7 @@ def agregar_productos_carrito(request,id_producto):
             carrito_productos.append(id_producto)
         
         request.session["carrito_productos"] = carrito_productos  # Guardar en sesión
-        return redirect('ver_tienda')
+        return redirect(request.META.get('HTTP_REFERER', 'index'))
     #Exepcion si el id ingresado en l html no se encuentra en el id del modelo 
     except Productos.DoesNotExist:
         messages.info(request,'❌ ERROR : No Hay Datos Asociados')
@@ -395,10 +397,12 @@ def panel_barbero(request):
         usuario = Usuarios.objects.get(pk = verificar['id'])
         barbero = usuario.barberos.first()
         cita_barbero = barbero.cita_barbero.all()
+        
 
         contexto={
             'barbero':barbero,
             'cita_barbero' :cita_barbero,
+            
         } 
         return render(request,'barberos/panel_barbero.html',contexto)
     except Usuarios.DoesNotExist:
@@ -410,15 +414,60 @@ def panel_barbero(request):
     except Citas.DoesNotExist:
         messages.warning(request,'❌ ERROR :No hay Datos Sobre Barberos Asociados')
     return redirect('index')
+
+def enviar_correo_html ( request,id_cliente ):
+    verificar = request.session.get('logueado',False)
+    if not verificar or verificar['rol'] != 'B':
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
+        return redirect('index')
+    try:
+        cliente = Clientes.objects.get(pk = id_cliente)
+        return render(request,'barberos/enviar_correo_html.html',{'cliente':cliente})
+    except Clientes.DoesNotExist:
+        messages.error(request, "❌ No hay Datos Existentes.")
+        return redirect('panel_barbero')
+
+def enviar_correo(request):
+    verificar = request.session.get('logueado',False)
+    if not verificar or verificar['rol'] != 'B':
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
+        return redirect('index')
+    if request.method == 'POST' :
+        asunto  =request.POST.get('asunto')
+        mensaje =request.POST.get('mensaje')
+        correo  =request.POST.get('correo') 
+        try:
+            send_mail(
+                asunto,
+                '',  # Aquí no va texto plano
+                'santiagoholguin150@gmail.com',
+                [correo],
+                fail_silently=False,
+                html_message=mensaje
+            )
+            messages.success(request, "✅ Correo enviado correctamente.")
+        except Exception as e:
+            messages.error(request, "❌ Error al enviar el correo.")
+    return redirect('panel_barbero')
 #endregion
 
+
 #region ADMIN PANEL
+#incio
 def admin_panel(request):
     verificar = request.session.get('logueado',False)
     if not verificar or  verificar['rol'] != 'A':
         messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     return render(request,'admin/inicio.html')
+
+#
+def dashboard(request):
+    verificar = request.session.get('logueado',False)
+    if not verificar or  verificar['rol'] != 'A':
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
+        return redirect('index')
+    return render(request,'admin/dashboard.html')
 
 #region USUARIOS
 def listar_usuarios(request):
@@ -539,8 +588,21 @@ def detalles_barberos(request,id_barbero):
     else:
         try:
             barbero = Barberos.objects.get(pk = id_barbero)
+            dias = Barberos.DIAS
+            
+            if request.method == 'POST' :
+                horario_trabajo =  request.POST.get('horario_trabajo')
+                hora_inicio = request.POST.get('hora_inicio')
+                hora_final =  request.POST.get('hora_final')
+                barbero.horario_trabajo = horario_trabajo
+                barbero.hora_inicio = hora_inicio
+                barbero.hora_final = hora_final
+                messages.success(request,f'Se Asigno El Horario Correctamente a {barbero.usuario_barbero.nombre_completo}')
+                barbero.save()
+                return redirect('detalles_barberos',id_barbero=id_barbero)
             contexto = {
-                'barbero' : barbero
+                'barbero' : barbero,
+                'dias' :dias
             }
             return render(request,'admin/usuarios/detalles_barberos.html',contexto)
         except Exception as e:
@@ -1142,6 +1204,8 @@ def ultimos_datos_admin(request):
     for cita in citas:
         notificaciones.append(f'{cita.cliente.usuario_cliente.nombre_completo} agendo una cita  ')
     return JsonResponse({'notificaciones':notificaciones})
+
+
 #endregion
 
 #region Realizar Venta
@@ -1169,86 +1233,111 @@ def confirmar_reserva(request): # html para seleccioanar barbero , fecha y hora 
     })
 
 
-
 def realizar_compra(request):
-    verificar = request.session.get('logueado',False)
-    verificar_carrito = request.session.get('carrito_servicios',False)
-    verificar_carrito_productos = request.session.get('carrito_productos',False)
-    if not verificar and verificar['rol'] != 'C' :
-        messages.error(request,'Permiso Denegado')
-        return redirect('index')
-    if request.method == 'POST' :
-        try:
-            usuario = Usuarios.objects.get(pk = verificar['id'])
-            cliente = Clientes.objects.get(usuario_cliente = usuario)
-            
-            if verificar_carrito:
-                #recorremos la lista
-                
-                
-                for servicio_id in request.session['carrito_servicios']:
-                    servicio = Servicios.objects.get(id = servicio_id)
-                    
-                    fecha_str = request.POST.get(f'fecha_{servicio_id}')
-                    hora_str = request.POST.get(f'hora_{servicio_id}')
-                    barbero_id = request.POST.get(f'barbero_{servicio_id}')
-                    
-                    
-                    
-                    if not fecha_str or not hora_str or not barbero_id:
-                        messages.error(request, 'Por favor completa todos los campos para cada servicio.')
-                        return redirect('confirmar_reserva')
-                    
-                    
-                    fecha = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-                    hora = datetime.strptime(hora_str, '%H:%M').time()
-                    barbero = Barberos.objects.get(id=barbero_id)
+    verificar = request.session.get('logueado', False)
+    verificar_carrito = request.session.get('carrito_servicios', [])
+    verificar_carrito_productos = request.session.get('carrito_productos', [])
 
-                    cita = Citas(
-                        cliente = cliente,
-                        hora = hora,
-                        fecha = fecha,
-                        estado = 'PRO',
-                        barbero = barbero
+    if not verificar or verificar['rol'] != 'C':
+        messages.error(request, 'Permiso Denegado')
+        return redirect('index')
+
+    if request.method == 'POST':
+        try:
+            usuario = Usuarios.objects.get(pk=verificar['id'])
+            cliente = Clientes.objects.get(usuario_cliente=usuario)
+
+            # Si hay servicios en el carrito
+            if verificar_carrito:
+                primer_servicio_id = verificar_carrito[0]  # Usamos el primer servicio como referencia
+
+                fecha_str = request.POST.get('fecha')
+                hora_str = request.POST.get('hora')
+                barbero_id = request.POST.get('barbero')
+
+                if not fecha_str or not hora_str or not barbero_id:
+                    messages.error(request, 'Por favor completa la fecha, hora y barbero.')
+                    return redirect('confirmar_reserva')
+
+                fecha = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+                hora = datetime.strptime(hora_str, '%H:%M').time()
+                barbero = Barberos.objects.get(id=barbero_id)
+
+                # Creamos la cita principal
+                cita = Citas.objects.create(
+                    cliente=cliente,
+                    hora=hora,
+                    fecha=fecha,
+                    estado='PRO',
+                    barbero=barbero
+                )
+
+                # Asociamos todos los servicios seleccionados a la cita
+                for servicio_id in verificar_carrito:
+                    servicio = Servicios.objects.get(id=servicio_id)
+                    CitaServicios.objects.create(cita=cita, servicio=servicio)
+
+                # Calculamos el total de los servicios
+                total_servicios = sum(Servicios.objects.get(id=s).precio for s in verificar_carrito)
+            else:
+                total_servicios = 0  # Si no hay servicios, el total de servicios es 0
+
+            # Calculamos el total de los productos
+            total_productos = sum(Productos.objects.get(id=p).precio for p in verificar_carrito_productos)
+
+            # Total general
+            total = total_servicios + total_productos
+
+            # Creamos el pago asociado a la cita (si hay cita)
+            pago = Pagos.objects.create(
+                cliente=cliente,
+                monto_total=total,
+                cita=cita if verificar_carrito else None  # Asocia la cita si hay
+            )
+
+            # Si hay productos, los procesamos
+            for id_producto in verificar_carrito_productos:
+                producto = Productos.objects.get(id=id_producto)
+                inventario = Inventarios.objects.get(producto=producto)
+
+                if inventario.stock > 0:
+                    inventario.stock -= 1
+                    inventario.save()
+
+                    ProductosComprados.objects.create(
+                        pago=pago,
+                        producto=producto,
                     )
-                    cita.save()
-                    
-                    #Creamos la cita servicio con la instancia de la cita de arriba y el servicio
-                    cita_servicio = CitaServicios(
-                        cita = cita,
-                        servicio = servicio
-                    )
-                    cita_servicio.save()
-                    
-            if verificar_carrito_productos:
-                # descuenta inventario y simula venta
-                for id_producto in verificar_carrito_productos:
-                    inventario = Inventarios.objects.get(producto_id=id_producto)
-                    if inventario.stock > 0:
-                        inventario.stock -= 1
-                        inventario.save()
-                    else:
-                        messages.error(request, 'Producto sin stock')
-                        return redirect('confirmar_reserva')
-        
-            #vaciamos el carrito con los servicios cuanto se agrega a cita servicios
+                else:
+                    messages.error(request, f'Producto sin stock: {producto.nombre}')
+                    return redirect('confirmar_reserva')
+
+            # Limpiamos el carrito
             request.session['carrito_servicios'] = []
             request.session['carrito_productos'] = []
-            messages.success(request,' ✅ MENSAJE :  Compra Realizada Con Exito ')
+
+            messages.success(request, '✅ MENSAJE: Compra Realizada Con Éxito')
             return redirect('index')
-        
-    
-        except Citas.DoesNotExist:
-            messages.warning(request,'❌ ERROR :No hay Datos Sobre Citas Asociadas')
-        except Usuarios.DoesNotExist:
-            messages.warning(request,'❌ ERROR :No hay Datos Sobre Usuarios  Asociados')
-        except Barberos.DoesNotExist:
-            messages.info(request,'ℹ️ INFO : Por Favor Selecciona Un Barbero. ')
-        except Servicios.DoesNotExist:
-            messages.warning(request,'❌ ERROR :No hay Datos Sobre Servicios Asociados')
+
         except Exception as e:
-            messages.warning(request,f'❌ ERROR : Al Procesar la Compra  - {e}')
-        return redirect('confirmar_reserva')
-    else:
-        return redirect('confirmar_reserva')
+            messages.warning(request, f'❌ ERROR al procesar la compra: {e}')
+            return redirect('confirmar_reserva')
+
+    return redirect('confirmar_reserva')
+
+def historial_pagos(request):
+    verificiar = request.session.get('logueado',False)
+    if not verificiar:
+        messages.error(request,'No tienes Permitido hacer esto')
+        return redirect('index')
+    try:
+        
+        usuario = Usuarios.objects.get(pk = verificiar['id'])
+        cliente = Clientes.objects.get(usuario_cliente = usuario)
+        pagos = cliente.pagos.all()
+        
+        return render (request,'clientes/historial_pagos.html',{'pagos' : pagos})
+    except Exception as e:
+        messages.error(request,f'{e}')
+        return redirect('index')
 #endregion

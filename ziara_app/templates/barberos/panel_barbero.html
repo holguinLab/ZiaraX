@@ -10,7 +10,11 @@
                 <div class="card-body">
                     <img src="{{request.session.logueado.foto}}" class="rounded-circle mb-3" width="200" height="200">
                     <h4 class="fw-bold"> {{barbero.usuario_barbero.nombre_completo}} </h4>
-                    <p class="fst-italic"> {{barbero.especialidad}} </p>
+                    <p class="fst-italic"> {{barbero.get_horario_trabajo_display}} 
+                        <br>
+                        <span>{{barbero.hora_inicio}} {{barbero.hora_final}}</span>
+                    </p>
+                    
                     <a href="{%url 'ver_perfil' request.session.logueado.id %}" class="btn btn-light btn-sm">Editar Perfil</a>
 
                 </div>
@@ -30,19 +34,20 @@
         <!-- Contenido principal -->
         <div class="col-md-9">
             <!-- Notificaciones -->
-            <div class="alert alert-warning d-flex align-items-center shadow">
-                <i class="bi bi-bell-fill me-2"></i>
-                <div>¡Nueva cita programada para las 16:00 con Andrea C.!</div>
-            </div>
+            {%for cita in cita_barbero%}
+                <div class="alert alert-warning d-flex align-items-center shadow alert-dismissible fade show" role="alert">
+                    <i class="bi bi-bell-fill me-2"></i>
+                    <div>¡Nueva cita programada para las {{ cita.hora }} con {{ cita.cliente.usuario_cliente.nombre_completo }}!</div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {%endfor%}
             
             <!-- Tabs para organizar el contenido -->
             <ul class="nav nav-tabs" id="barberTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="agenda-tab" data-bs-toggle="tab" data-bs-target="#agenda" type="button" role="tab">📅 Agenda</button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="pendientes-tab" data-bs-toggle="tab" data-bs-target="#pendientes" type="button" role="tab">⏳ Pendientes</button>
-                </li>
+
             </ul>
             
             <div class="tab-content mt-3" id="barberTabsContent">
@@ -55,10 +60,10 @@
 
                             <div class="row d-flex align-items-center justify-content-around  gap-5 mb-3 mt-3  ">
                                 <div class="col-md-6 shadow-lg  ">
-                                    <li class="list-group-item "> <span class="text-success fw-bold">  Cliente </span>  :  {{cita.cliente.usuario_cliente.nombre_completo}} <br> <span class="text-success fw-bold" > Servicios : </span> {%for servicio in cita.citas.all%}  <span> {{servicio.servicio.nombre}}  ,</span> {%endfor%} <br> <span class="text-success fw-bold" > Fecha  :  </span> {{cita.fecha}}  <br> <span class="text-success fw-bold "> Hora :  </span> </li>
+                                    <li class="list-group-item "> <span class="text-success fw-bold">  Cliente </span>  :  {{cita.cliente.usuario_cliente.nombre_completo}} <br> <span class="text-success fw-bold" > Servicios : </span> {%for servicio in cita.citas.all%}  <span> {{servicio.servicio.nombre}}  ,</span> {%endfor%} <br> <span class="text-success fw-bold" > Fecha  :  </span> {{cita.fecha}}  <br> <span class="text-success fw-bold "> Hora :  </span> {{cita.hora}} </li>
                                 </div>
                                 <div class="col-md-4 text-center ">
-                                    <button class=" btn btn-outline-primary fw-semibold    "> Enviar correo </button>
+                                    <a href="{%url 'enviar_correo_html' cita.cliente.id%}" class=" btn btn-outline-primary fw-semibold    "> Enviar correo </a>
                                 </div>
                             </div>
 

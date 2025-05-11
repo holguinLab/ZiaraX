@@ -1,27 +1,27 @@
-{% extends 'panel/base_panel.html' %}
+{% extends 'index.html' %}
 {% load static %}
 {% block css %}
 {% endblock %}
 {% block titulo %}
-Iniciar Sesión
+Cambiar Contraseña
 {% endblock %}
 
 {% block main %}
-<form method="post" enctype="multipart/form-data" class="card dropdown-menu dropdown-menu-end p-4 row">
+<form method="post" enctype="multipart/form-data" class="card p-3  w-75 mt-5 shadow-sm border-0 rounded-3 mx-auto">
     {% csrf_token %}
     
-    <!-- Label y Campo de Email -->
+    <!-- Campo de Email -->
     <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
+        <label for="email" class="form-label fw-semibold">Correo electrónico</label>
         <div class="input-group">
-            <span class="input-group-text" id="inputGroupPrepend">@</span>
-            <input type="text" name="email" class="form-control" id="email" placeholder="JoeDoe@ejemplo.com" required>
+            <span class="input-group-text bg-success text-white" id="inputGroupPrepend">@</span>
+            <input type="email" name="email" class="form-control" id="email" placeholder="joe.doe@ejemplo.com" required>
         </div>
     </div>
 
     <!-- Botón de Enviar -->
     <div>
-        <button type="submit" class="btn btn-outline-success w-100">Verificar</button>
+        <button type="submit" class="btn btn-success w-100 fw-semibold">Verificar</button>
     </div>
 </form>
 {%endblock%}

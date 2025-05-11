@@ -76,6 +76,11 @@
                         <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page"
                             href="{%url 'ver_citas'%} ">Citas</a>
                     </li>
+
+                    <li class="nav-item">
+                        <a style="color: #1A1A1A;" class="nav-link active  " aria-current="page"
+                            href="{%url 'reservas_citas'%} ">Servicios</a>
+                    </li>
                     {%endif%}
 
                     {%if not request.session.logueado %}
@@ -167,12 +172,11 @@
                                     <li><a class="dropdown-item"
                                             href="{%url 'ver_perfil' request.session.logueado.id%}">Editar Perfil</a>
                                     </li>
-                                    <li><a class="dropdown-item" href="#">Configuración</a></li>
                                     <li><a class="dropdown-item" href="{%url 'recuperar_password'%}">Cambiar
                                             Contraseña</a></li>
-                                    <li><a class="dropdown-item" href="#">Mis Citas</a></li>
+                                    <li><a class="dropdown-item" href="{%url 'ver_citas'%}">Mis Citas</a></li>
                                     <!-- Si aplicas esto en Ziara -->
-                                    <li><a class="dropdown-item" href="#">Historial de Pagos</a></li>
+                                    <li><a class="dropdown-item" href="{%url 'historial_pagos'%}">Historial de Pagos</a></li>
                                     <hr>
                                     <li><a class="dropdown-item text-danger" href="{%url 'logout'%}">Cerrar Sesión</a>
                                     </li>
@@ -187,7 +191,7 @@
                                     <li><a class="dropdown-item"
                                             href="{%url 'ver_perfil' request.session.logueado.id%}">Editar Perfil</a>
                                     </li>
-                                    <li><a class="dropdown-item" href="#">Configuración</a></li>
+                               
                                     <li><a class="dropdown-item" href="{%url 'recuperar_password'%}">Cambiar
                                             Contraseña</a></li>
                                     <hr>

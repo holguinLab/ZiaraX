@@ -88,15 +88,21 @@
 
     <div id="servicios" class="row  d-flex p-5 mb-0  justify-content-around mt-5 gap-5"
         style="background-color: #ffffff;">
-        <h3 class="display-4  fw-bold text-center " style="color: #717171;">Nuestros <span style="color: #66BB69;"">Servicios</span></h3>
+        <h3 class="display-4  fw-bold text-center " style="color: #717171;">Servicios <span style="color: #66BB69;"">Recientes  </span></h3>
 
 
-        {%for servicio in servicios%}
+        {%for servicio in ultimos_servicios%}
         <div id=" card" class="card shadow-lg p-0" style="width: 18rem;">
                 <img id="img_{{servicio.id}}" class="card-img-top  " alt="Foto Servicio : {{servicio.nombre}}">
                 <div class="card-body text-center">
                     <h5 class="card-title">{{servicio.nombre}}</h5>
                     <p class="card-text">Desde {{servicio.precio}} $ </p>
+                    {% if request.session.logueado.rol == 'C' %}
+                        <a href="{% url 'agregar_servicio_carrito' servicio.id %}"
+                        class="btn btn-success w-100 fw-bold shadow-sm">🛒 Agregar al Carrito</a>
+                    {% else %}
+                    <p class="text-danger fw-bold text-center">🔑 Regístrate o inicia sesión para comprar</p>
+                    {% endif %}
                 </div>
     </div>
     {%endfor%}
@@ -111,6 +117,20 @@
             <div class="card-body text-center">
                 <h5 class="card-title">{{producto.nombre}}</h5>
                 <p class="card-text">Desde {{producto.precio}} $ </p>
+                {% if request.session.logueado.rol == 'C' %}
+                        {% if producto.inventario_productos.all %}
+                            {% if producto.inventario_productos.first.stock > 0 %}
+                                <a href="{% url 'agregar_productos_carrito' producto.id %}"
+                                class="btn btn-success w-100 fw-bold shadow-sm">🛒 Agregar al Carrito</a>
+                            {% else %}
+                            <p class="text-danger fw-bold text-center">Producto agotado</p>
+                    {% endif %}
+                    {% else %}
+                    <p class="text-danger fw-bold text-center">Producto no disponible</p>
+                    {% endif %}
+                    {% else %}
+                    <p class="text-danger fw-bold text-center">🔑 Regístrate o inicia sesión para comprar</p>
+                    {% endif %}
             </div>
 </div>
 {%endfor%}
