@@ -41,6 +41,9 @@
                         {%for admin in admins%}
                             <li class="list-group-item"> <span class="fw-bold text-success">{{admin.usuario_admin.nombre_completo}}</span> Registro una Cuenta Tipo Admin  </li>
                         {%endfor%}
+                        {%for cliente in clientes%}
+                            <li class="list-group-item"> El Ciente <span class="fw-bold text-success"> {{cliente.usuario_cliente.nombre_completo}}</span> Se Registro En Ziara  </li>
+                        {%endfor%}
                     </ul>
                 </div>
             </div>

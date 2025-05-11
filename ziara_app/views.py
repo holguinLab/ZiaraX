@@ -482,6 +482,7 @@ def dashboard(request):
         messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
         return redirect('index')
     citas=Citas.objects.order_by('-id')[:1]
+    clientes=Clientes.objects.order_by('-id')[:1]
     barberos=Barberos.objects.order_by('-id')[:1]
     admin=Administradores.objects.order_by('-id')[:1]
     servicios=Servicios.objects.order_by('-id')[:1]
@@ -493,7 +494,8 @@ def dashboard(request):
         'servicios':servicios,
         'productos':productos,
         'pagos':pagos,
-        'admins':admin
+        'admins':admin,
+        "clientes" : clientes
     }
     
     return render(request,'admin/dashboard.html',contexto)
