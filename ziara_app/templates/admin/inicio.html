@@ -1,22 +1,102 @@
-{%extends 'admin/admin_base.html'%}
-{%load static%}
-{%block titulo%}Inicio{%endblock%}
-{%block main%}
+{% extends 'admin/admin_base.html' %}
+{% load static %}
 
+{% block titulo %}Dashboard{% endblock %}
 
-<div class="container mt-5">
-    <div class="card shadow-lg border-0 rounded-4 bg-light">
-        <div class="card-body text-center p-5">
-            <h1 class="display-5 fw-bold text-success">
-                <i class="bi bi-stars me-2"></i> ¡Bienvenido, {{ request.session.logueado.nombre }}!
-            </h1>
-            <p class="lead text-secondary mt-3">
-            Este es tu panel administrativo. Desde aquí puedes gestionar los servicios, productos, inventario, horarios de barberos, y la creación de cuentas para barberos y administradores.
-            </p>
-            <hr class="my-4">
-            <p class="text-muted">Hoy es un gran día para lograr cosas increíbles. 💪</p>
+{% block main %}
+<main class="container py-4">
+    <div class="row g-4">
+        <!-- Sección izquierda -->
+        <div class="col-lg-7">
+            <!-- Saludo -->
+            <div class="bg-white p-4 shadow-sm rounded-4 mb-4">
+                <h2 class="fw-bold text-dark">👋 Hola, JULIAN</h2>
+                <p class="text-muted mb-0">Bienvenido al panel de administración de Ziara</p>
+            </div>
+
+            <!-- Métricas -->
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4 bg-gradient-primary text-white">
+                        <div class="card-body">
+                            <h6 class="text-uppercase text-dark">Clientes registrados</h6>
+                            <h2 class="fw-bold text-dark">{{ todos_clientes|length }}</h2>
+                            <i class="bi bi-people-fill fs-2 text-dark"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4 bg-gradient-success text-white">
+                        <div class="card-body">
+                            <h6 class="text-uppercase text-dark">Citas agendadas</h6>
+                            <h2 class="fw-bold text-dark">{{ todas_citas|length }}</h2>
+                            <i class="bi bi-calendar-check fs-2 text-dark"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Últimas acciones -->
+            <div class="card shadow-sm mt-4 rounded-4">
+                <div class="card-header bg-light border-0">
+                    <h5 class="mb-0 text-primary">📌 Últimas Acciones</h5>
+                </div>
+                <div class="card-body" style="max-height: 230px; overflow-y: auto;">
+                    <ul class="list-group list-group-flush small">
+                        {% for cita in citas %}
+                        <li class="list-group-item">{{ cita.cliente.usuario_cliente.nombre_completo }} agendó una cita</li>
+                        {% endfor %}
+                        {% for servicio in servicios %}
+                        <li class="list-group-item">Nuevo servicio: <strong class="text-success">{{ servicio.nombre }}</strong></li>
+                        {% endfor %}
+                        {% for producto in productos %}
+                        <li class="list-group-item">Nuevo producto: <strong class="text-success">{{ producto.nombre }}</strong></li>
+                        {% endfor %}
+                        {% for pago in pagos %}
+                        <li class="list-group-item"><strong>{{ pago.cliente.usuario_cliente.nombre_completo }}</strong> realizó un pago</li>
+                        {% endfor %}
+                        {% for barbero in barberos %}
+                        <li class="list-group-item"><strong>{{ barbero.admin_creador.nombre_completo }}</strong> registró un barbero</li>
+                        {% endfor %}
+                        {% for admin in admins %}
+                        <li class="list-group-item">Se Registro <strong>{{ admin.usuario_admin.nombre_completo }}</strong>  Como Admin</li>
+                        {% endfor %}
+                        {% for cliente in clientes %}
+                        <li class="list-group-item">Nuevo cliente: <strong>{{ cliente.usuario_cliente.nombre_completo }}</strong></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección derecha -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm rounded-4">
+                <div class="card-header bg-light border-0">
+                    <h5 class="text-primary">👥 Empleados Registrados</h5>
+                </div>
+                <div class="card-body">
+                    {% if barberos or admins %}
+                    <ul class="list-group list-group-flush">
+                        {% for barbero in barberos %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>🔹 {{ barbero.usuario_barbero.nombre_completo }}</span>
+                            <span class="badge bg-success">{{ barbero.usuario_barbero.get_tipoUsuario_display }}</span>
+                        </li>
+                        {% endfor %}
+                        {% for admin in admins %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>🔹 {{ admin.usuario_admin.nombre_completo }}</span>
+                            <span class="badge bg-warning text-dark">{{ admin.usuario_admin.get_tipoUsuario_display }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted">No hay empleados registrados aún.</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
-</div>
-
-{%endblock%}
+</main>
+{% endblock %}

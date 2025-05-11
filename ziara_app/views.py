@@ -487,6 +487,9 @@ def dashboard(request):
     admin=Administradores.objects.order_by('-id')[:1]
     servicios=Servicios.objects.order_by('-id')[:1]
     productos=Productos.objects.order_by('-id')[:1]
+    
+    todas_citas = Citas.objects.all()
+    todos_clientes = Clientes.objects.all()
     pagos=Pagos.objects.order_by('-id')[:1]
     contexto = {
         'citas ': citas,
@@ -495,10 +498,12 @@ def dashboard(request):
         'productos':productos,
         'pagos':pagos,
         'admins':admin,
-        "clientes" : clientes
+        "clientes" : clientes,
+        "todas_citas" : todas_citas,
+        "todos_clientes" :todos_clientes
     }
     
-    return render(request,'admin/dashboard.html',contexto)
+    return render(request,'admin/inicio.html',contexto)
 
 #region USUARIOS
 def listar_usuarios(request):
