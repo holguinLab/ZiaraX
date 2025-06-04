@@ -72,6 +72,7 @@ urlpatterns=[
     path('panel_barbero/',panel_barbero,name='panel_barbero'),
     path('enviar_correo_html/<int:id_cliente>/',enviar_correo_html,name='enviar_correo_html'),
     path('enviar_correo/',enviar_correo,name='enviar_correo'),
+    path('actualizar_estado/<int:id_cita>',actualizar_estado,name='actualizar_estado'),
     
     
     

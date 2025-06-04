@@ -411,11 +411,13 @@ def panel_barbero(request):
         usuario = Usuarios.objects.get(pk = verificar['id'])
         barbero = usuario.barberos.first()
         cita_barbero = barbero.cita_barbero.all()
+        estados = Citas.ESTADOS
 
 
         contexto={
             'barbero':barbero,
             'cita_barbero' :cita_barbero,
+            'estados' : estados,
             
         } 
         return render(request,'barberos/panel_barbero.html',contexto)
@@ -463,6 +465,22 @@ def enviar_correo(request):
         except Exception as e:
             messages.error(request, "❌ Error al enviar el correo.")
     return redirect('panel_barbero')
+
+def actualizar_estado(request,id_cita):
+    verificar = request.session.get('logueado',False)
+    if not verificar or verificar['rol'] != 'B':
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
+        return redirect('index')
+    if request.method == 'POST':
+        estado = request.POST.get('estado')
+        try:
+            cita = Citas.objects.get(pk = id_cita)
+            cita.estado = estado
+            cita.save()
+        except Citas.DoesNotExist:
+            messages.warning(request,'⚠️ WARNING : No Hay Datos Asociados')
+    return redirect('panel_barbero')
+
 #endregion
 
 
