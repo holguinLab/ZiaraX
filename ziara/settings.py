@@ -129,6 +129,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'ziara_app/media'
 
 
+STATICFILES_DIRS = [ BASE_DIR / 'ziara_app/static' ]  # o la ruta correcta donde están tus archivos
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
 # Para configurar correo y enviar desde nuestra app
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
