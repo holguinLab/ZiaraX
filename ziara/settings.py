@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-!ly^+1un0izuf6&znxq3f^mllu&=o*3kvm5@pl#g37n)+&14#j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['ziara-render.onrender.com','localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
