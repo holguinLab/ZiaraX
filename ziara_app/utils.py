@@ -1,6 +1,8 @@
 import base64
 import hashlib
 import secrets
+import zipfile
+import os
 
 ALGORITHM = "pbkdf2_sha256"
 
@@ -35,3 +37,10 @@ hash = 'pbkdf2_sha256$600000$sena2025$n6uiSQK6eftdb/FhC8BKhL6g4vh+e1Hen+HhbOTD/3
 hash2='pbkdf2_sha256$260000$4e3c3baae659b285921b584cdef2599d$n4NT4vXUNvpyQBlSDd9IewkQeJG6tRmLsA3raUN6a9I='
 print(verify_password(clave,hash))
 print(verify_password(clave,hash2)) """
+
+
+
+
+def compress_file_to_zip(file_path, output_path):
+    with zipfile.ZipFile(output_path, 'w') as zipf:
+        zipf.write(file_path, arcname=os.path.basename(file_path))
