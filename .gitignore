@@ -1,1 +1,34 @@
 __pycache__
+
+# Archivos de Python compilados
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Base de datos local
+*.sqlite3
+*.db
+
+# Archivos de logs
+*.log
+*.log.*
+logs/
+*.bak
+
+# Archivos de backup generados por cron
+*.zip
+
+# Archivos de entorno (variables secretas)
+.env
+.env.*
+
+# Archivos de configuración personal (de IDE)
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
