@@ -6,7 +6,8 @@ from django.conf import settings
 # ✅ Configuración de Django
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-sys.path.append("/home/holguinLab/ZiaraX")
+#sys.path.append("/home/holguinLab/ZiaraX")
+sys.path.append(str(BASE_DIR)) # Para que funcione tanto en desarrollo como en produccion sin cambiar ruta 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ziara.settings")
 
 
