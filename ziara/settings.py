@@ -144,8 +144,8 @@ EMAIL_HOST_PASSWORD = 'ylaxgqrfwbgdktak'
 
 
 # Rest Framework la seccion de auth
-REST_FRAMEWORK  = {
+""" REST_FRAMEWORK  = {
     'DEFAULT_PERMISSION_CLASSES':[
         'mira pdf '
     ]
-}
+} """
