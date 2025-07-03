@@ -1412,4 +1412,8 @@ from rest_framework import viewsets
 class UsuariosViewSet(viewsets.ModelViewSet):
     queryset = Usuarios.objects.all()
     serializer_class = UsuarioSerializer
+
+class ServiciosViewSet(viewsets.ModelViewSet):
+    queryset = Servicios.objects.all()
+    serializer_class = ServiciosSerializer
 #endregion

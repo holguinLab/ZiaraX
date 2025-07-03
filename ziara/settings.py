@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-!ly^+1un0izuf6&znxq3f^mllu&=o*3kvm5@pl#g37n)+&14#j'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -141,3 +141,11 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'santiagoholguin150@gmail.com'
 EMAIL_HOST_PASSWORD = 'ylaxgqrfwbgdktak'
+
+
+# Rest Framework la seccion de auth
+REST_FRAMEWORK  = {
+    'DEFAULT_PERMISSION_CLASSES':[
+        'mira pdf '
+    ]
+}

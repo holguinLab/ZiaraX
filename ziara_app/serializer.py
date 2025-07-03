@@ -8,3 +8,9 @@ class UsuarioSerializer(serializers.ModelSerializer):
         model = Usuarios
         fields = '__all__'
 
+
+
+class ServiciosSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Servicios
+        fields = ['id','nombre','precio']
