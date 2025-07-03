@@ -1404,3 +1404,12 @@ def historial_pagos(request):
         messages.error(request,f'{e}')
         return redirect('index')
 #endregion
+
+#region DjangoRestFramework
+from .serializer import *
+from rest_framework import viewsets
+
+class UsuariosViewSet(viewsets.ModelViewSet):
+    queryset = Usuarios.objects.all()
+    serializer_class = UsuarioSerializer
+#endregion

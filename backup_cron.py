@@ -2,11 +2,13 @@ import os, sys, time
 from pathlib import Path
 from datetime import datetime
 from ziara_app.utils import compress_file_to_zip # Asegúrate de tener esta función
-
+from django.conf import settings
 # ✅ Configuración de Django
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 sys.path.append("/home/holguinLab/ZiaraX")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ziara.settings")
+
 
 import django
 django.setup()
@@ -15,8 +17,22 @@ django.setup()
 fecha = datetime.now().strftime("%Y-%m-%d_%H-%M")
 nombre_zip = f"backup_ziara_{fecha}.zip"
 
-file_to_compress = '/home/holguinLab/ZiaraX/db.sqlite3'
-zip_archive_name = f'/home/holguinLab/ZiaraX/{nombre_zip}'
+#https://gitlab.com/cfdcm/adso/2903013/-/blob/main/django/sena/backup_cron.py?ref_type=heads
+#El profesor hace una funcion para enviar el correo cuando se le da click es decir no automatizada , el profesor lo lo hace en la vista 
+
+#ejecutar chmod +x al archivo buckup_cron.py
+#crontab -e abre en modo edcion
+
+#28 11 * * * /usr/bin/python3 /home/jorgeg/Documentos/repos/cfdcm/adso/2903013/django/sena/backup_cron.py  >> /home/jorgeg/Documentos/repos/cfdcm/adso/2903013/django/sena/log_bk.txt 2>&1
+
+file_to_compress = os.path.join(settings.BASE_DIR, 'db.sqlite3') #Investigar si sirve con pythonanyware
+zip_archive_name = os.path.join(settings.BASE_DIR, f'backup_ziara_{fecha}.zip') #investigar si sirve con pythonanyware
+
+
+#file_to_compress = '/home/holguinLab/ZiaraX/db.sqlite3'
+#zip_archive_name = f'/home/holguinLab/ZiaraX/{nombre_zip}'
+
+
 
 # ✅ Comprimir base de datos
 try:
@@ -48,3 +64,5 @@ if os.path.exists(zip_archive_name):
         print(f"❌ Error al enviar el correo: {e}")
 else:
     print("⚠️ No se encontró el archivo ZIP.")
+
+

@@ -1,7 +1,19 @@
-from django.urls import path
+from django.urls import path,include
 from . views import *
 
+
+#Api Rest Framework
+from rest_framework import routers
+router = routers.DefaultRouter()
+
+router.register('usuariosViewSet',UsuariosViewSet)
+# --------------------------------------------------
+
+
 urlpatterns=[
+    path("api/",include(router.urls)), #Api Rest
+
+
     path('',index,name='index'),
     #Esta ruta es la que retorna un json para usarlo en la api de pixaby 
     path('obtener_servicios/',obtener_servicios,name='obtener_servicios'),
