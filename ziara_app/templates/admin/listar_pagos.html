@@ -1,0 +1,94 @@
+{%extends 'admin/admin_base.html'%}
+{%load static%}
+{%block titulo%}Pagos{%endblock%}
+{%block dataTables%}<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">{%endblock%}
+{%block main%}
+
+<!-- ('cliente', 'cita', 'fecha_pago', 'monto_total', ) -->
+<div class="table-responsive  w-100 p-5">
+    <table id="miTabla" class="  pt-3 table  table-hover  w-100">
+        <thead >
+            <tr >
+                <th class="text-center" style="display: none;">ID</th>
+                <th class="text-center">Cliente</th>
+                <th class="text-center" >Servicios</th>
+                <th class="text-center" >Productos</th>
+                <th class="text-center" >Fecha de Pago</th>
+                <th class="text-center" >Monto Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for p in pagos %}
+            <tr>
+                <form  action="" method="post">
+                    {%csrf_token%}
+                    <td style="display:  none;">
+                        <input type="text" name="id" value="{{p.id}}" class="form-control">
+                    </td>
+
+                    <td class="col-md-4 col-lg-2">
+                        <p class="text-center text-capitalize">{{p.cliente.usuario_cliente.nombre_completo}}</p>
+                    </td>
+                    
+                    <td class="col-md-2 col-lg-1">
+                        <ul>
+                        {%for servicio in p.cita.citas.all%}
+                            <li> {{servicio.servicio}}</li>
+                        {%endfor%}
+                        </ul>
+                        
+                    </td>
+
+                    <td class="col-md-2 col-lg-1">
+                        <ul>
+                        {%for producto in p.productos_comprados.all%}
+                            <li> {{producto.producto}}</li>
+                        {%endfor%}
+                        </ul>
+                    </td>
+
+
+                    <td class="col-md-4 col-lg-2">
+                        <p class="text-center"> {{p.fecha_pago}} </p>
+                    </td>
+
+
+                    <td class="text-center col-md-4 col-lg-2 ">
+                        <p class="text-center"> {{p.monto_total}} $ </p>
+                    </td>
+
+                </form>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
+</div>
+{%endblock%}
+
+
+
+{%block configTables%}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#miTabla').DataTable({
+            paging: true, // Paginación
+            searching: true, // Búsqueda
+            ordering: true, // Ordenamiento
+            pageLength: 5, // Número de filas por página
+            language: {
+                search: "Buscar:", // Personaliza el texto de búsqueda
+                lengthMenu: "Mostrar _MENU_ registros",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                paginate: {
+                    first: "Primero",
+                    last: "Último",
+                    next: "Siguiente",
+                    previous: "Anterior"
+                }
+            }
+        });
+    });
+</script>
+{%endblock%}

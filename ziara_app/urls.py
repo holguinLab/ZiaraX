@@ -4,6 +4,9 @@ from . views import *
 
 #Api Rest Framework
 from rest_framework import routers
+
+
+
 router = routers.DefaultRouter()
 
 router.register('usuariosViewSet',UsuariosViewSet)
@@ -14,6 +17,20 @@ router.register('serviciosViewSet',ServiciosViewSet)
 urlpatterns=[
     path("api/",include(router.urls)), #Api Rest
     path("api/auth/",include('rest_framework.urls')),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     path('',index,name='index'),
     #Esta ruta es la que retorna un json para usarlo en la api de pixaby 
@@ -52,12 +69,13 @@ urlpatterns=[
     #NOTIFICACIONES
     path('ultimos_datos_admin/',ultimos_datos_admin,name='ultimos_datos_admin'),
     
-    
-    
-    
+
     #INVENTARIO
     path('inventario/',inventario,name='inventario'),
-    
+
+    #PAGOS
+    path('listar_pagos/',listar_pagos,name='listar_pagos'),
+
     #endregion
 
     #region CLIENTES

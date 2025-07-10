@@ -3,10 +3,12 @@ from .models import *
 
 
 #
-class UsuarioSerializer(serializers.ModelSerializer):
+
+class UsuariosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuarios
-        fields = '__all__'
+        #fields = "__all__"
+        fields = "__all__"
 
 
 

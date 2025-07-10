@@ -808,6 +808,20 @@ def eliminar_producto(request,id_producto):
 
 #endregion
 
+#region PAGOS
+def listar_pagos(request):
+    verificar = request.session.get('logueado',False)
+    if not verificar or  verificar['rol'] != 'A'  :
+        messages.warning(request,'⚠️ WARNING : No Tienes Permitido Hacer Esto')
+        return redirect('index')
+    try:
+        pagos = Pagos.objects.all()
+        return render (request,'admin/listar_pagos.html',{'pagos' : pagos})
+    except Exception as e:
+        messages.error(request,f'{e}')
+        return redirect('index')
+
+
 #endregion
 
 #region PANEL DE SESION
@@ -1394,7 +1408,6 @@ def historial_pagos(request):
         messages.error(request,'No tienes Permitido hacer esto')
         return redirect('index')
     try:
-        
         usuario = Usuarios.objects.get(pk = verificiar['id'])
         cliente = Clientes.objects.get(usuario_cliente = usuario)
         pagos = cliente.pagos.all()
@@ -1407,11 +1420,13 @@ def historial_pagos(request):
 
 #region DjangoRestFramework
 from .serializer import *
+
 from rest_framework import viewsets
 
+#get ,post,putch,delete,put
 class UsuariosViewSet(viewsets.ModelViewSet):
     queryset = Usuarios.objects.all()
-    serializer_class = UsuarioSerializer
+    serializer_class = UsuariosSerializer
 
 class ServiciosViewSet(viewsets.ModelViewSet):
     queryset = Servicios.objects.all()
